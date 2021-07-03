@@ -1,0 +1,479 @@
+MOGA Script for Scilab 6.0.0 Editor 
+(simplified scripted standardized test MOP in the MOEAs-KAS-F-REPPs)
+
+//Script inicialization
+clear
+clc
+
+tic()
+// Flow duration curve
+function [Q]=flow(t)
+    // t is duration in %.
+    a=-10.904;
+    b=26.854;
+    c=-21.72;
+    d=5.8299;
+    Q=a*t^3+b*t^2+c*t+d;
+endfunction
+
+// Power plant generation potential
+function [P]=generation2(Q, H, Cap)
+    EffTransf=0.98; // Efficiency of transformers.
+    EffGen=0.95;    // Efficiency of generators.
+    EffTurb=0.90;   // Efficiency of turbines.
+    g=9.81;         // Earth gravity.
+    P=EffTransf*EffGen*EffTurb*g*Q*H;
+// Provided power must always be less or equal than installed capacity. 
+   if P>Cap then
+        P=Cap;
+    end
+endfunction
+
+// Instant energy generation
+function [E]=energy2(H, Cap, t)
+    Q=flow(t);
+    P=generation2(Q,H,Cap);
+    E=P*t;
+endfunction
+
+// Initial investment cost
+function [Ctot]=investment2(Cap)
+    a=-0.146;
+    b=4.2918;
+    c=2.2054;
+    Ctot=a*Cap^2+b*Cap+c;
+endfunction
+
+// Total generated energy and needed capacity
+function [Etot]=TotalEnergy2(H, Cap)
+Etot=0;
+i=1;
+for t=0:0.01:1
+    Etot=Etot+energy2(H,Cap,t);
+end
+endfunction
+
+// Function to be optimized
+function [y]=ga_f(x)
+    // Total generated energy
+    Etot=-TotalEnergy2(x(1),x(2));
+    // Investment cost
+    Ctot=-investment2(x(2));
+    y(1,1)=Etot;
+    y(1,2)=Ctot;
+endfunction
+
+//// MOGA ALGORITHM
+PopSize     = 200;  // The size of the population of individuals.
+Proba_cross = 0.5;  // The crossover probability.
+Proba_mut   = 0.3;  // The mutation probability.
+NbGen       = 15;    // The number of generations to be computed.
+NbCouples   = 110;  // The number of couples which will be selected so as to perform the crossover and mutation.
+Log         = %T;   // Will call the output function at the end of each iteration.
+nb_disp     = 10;   // Nb point to display from the optimal population.
+pressure    = 0.1;  // The value the efficiency of the worst individual.
+CapMax=generation2(flow(0),1100,99999999999999);    // Maximum possible installed capacity [MW]
+
+ga_params = init_param();
+ga_params = add_param(ga_params,'dimension',2);
+ga_params = add_param(ga_params,'minbound',[1.5,0]);
+ga_params = add_param(ga_params,'maxbound',[1100,CapMax]);
+
+[pop_opt,fobj_pop_opt,pop_init,fobj_pop_init] = optim_moga(ga_f,PopSize,NbGen,Proba_mut,Proba_cross,Log,ga_params)
+t=toc()
+
+// Basic statistics
+for i=1:PopSize
+     pop(i,:)=pop_opt(i);
+     fobj(i,:)=fobj_pop_opt(i,:);
+end
+// Hydraulic heigth [m]
+MeanX1=mean(pop(:,1));
+DesvStdX1=stdev(pop(:,1));
+// Installed capacity [kW]
+MeanX2=mean(pop(:,2));
+DesvStdX2=stdev(pop(:,2));
+// Energy produced [kWh]
+MeanRes1=mean(fobj(:,1));
+DesvStdRes1=stdev(fobj(:,1));
+// Investment costs
+MeanRes2=mean(fobj(:,2));
+DesvStdRes2=stdev(fobj(:,2));
+
+disp('Basic statistics')
+disp('Optimal Hydraulic height [m] (mean):')
+disp(MeanX1);
+disp('Optimal Hydraulic height [m] (stdev):')
+disp(DesvStdX1);
+disp('Optimal installed capacity [MW] (mean):')
+disp(MeanX2);
+disp('Optimal installed capacity [MW] (stdev):')
+disp(DesvStdX2);
+disp('Optimal generated energy [MWh] (mean):')
+disp(MeanRes1);
+disp('Optimal generated energy [MWh] (stdev):')
+disp(DesvStdRes1);
+disp('Optimal investment costs [monetary units] (mean):')
+disp(MeanRes2);
+disp('Optimal investment costs [monetary units] (stdev):')
+disp(DesvStdRes2);
+
+disp('Script runtime [s]');
+disp(t);
+
+// Compute Pareto front and filter 
+[f_pareto,pop_pareto] = pareto_filter(fobj_pop_opt,pop_opt);
+// Plot solution: Pareto front 
+scf(1);
+// Plotting initial population
+plot(fobj_pop_init(:,1),fobj_pop_init(:,2),'r.');
+// Plotting Pareto population 
+plot(f_pareto(:,1),f_pareto(:,2),'k.');
+// Plotting final population 
+plot(fobj_pop_opt(:,1),fobj_pop_opt(:,2),'g.'); 
+title("Pareto front - MOGA","fontsize",5); 
+xlabel("$f_1=-E_{tot}$","fontsize",4); 
+ylabel("$f_2=-C_{tot}$","fontsize",4); 
+legend(['Initial pop.','Pareto pop.','Final pop.']);
+
+// Transform list to vector for plotting Pareto set 
+dim=2;
+npop = length(pop_opt); 
+npopinit = length(pop_init); 
+nfpop = length(pop_pareto);
+pop_init2 = matrix(list2vec(pop_init),dim,npopinit)';  
+pop_opt = matrix(list2vec(pop_opt),dim,npop)'; 
+pop_pareto = matrix(list2vec(pop_pareto),dim,nfpop)';
+
+// Plot the Pareto set 
+scf(2); 
+// Plotting initial population
+plot(pop_init2(:,1),pop_init2(:,2),'r.');
+// Plotting Pareto population 
+plot(pop_pareto(:,1),pop_pareto(:,2),'k.'); 
+// Plotting final population 
+plot(pop_opt(:,1),pop_opt(:,2),'g.'); 
+title("Pareto Set - MOGA","fontsize",5); 
+xlabel("$x_1=H$","fontsize",4); 
+ylabel("$x_2=Cap$","fontsize",4); 
+legend(['Initial pop.','Pareto pop.','Final pop.']);
+
+NSGA-I Script for Scilab 6.0.0 Editor 
+(simplified scripted standardized test MOP in the MOEAs-KAS-F-REPPs)
+
+//Script inicialization
+clear
+clc
+
+tic()
+// Flow duration curve
+function [Q]=flow(t)
+    // t is duration in %.
+    a=-10.904;
+    b=26.854;
+    c=-21.72;
+    d=5.8299;
+    Q=a*t^3+b*t^2+c*t+d;
+endfunction
+
+// Power plant generation potential
+function [P]=generation2(Q, H, Cap)
+    EffTransf=0.98; // Efficiency of transformers.
+    EffGen=0.95;    // Efficiency of generators.
+    EffTurb=0.90;   // Efficiency of turbines.
+    g=9.81;         // Earth gravity.
+    P=EffTransf*EffGen*EffTurb*g*Q*H;
+    if P>Cap then
+        P=Cap;
+    end
+endfunction
+
+// Instant energy generation
+function [E]=energy2(H, Cap, t)
+    Q=flow(t);
+    P=generation2(Q,H,Cap);
+    E=P*t;
+endfunction
+
+// Initial investment cost
+function [Ctot]=investment2(Cap)
+    a=-0.146;
+    b=4.2918;
+    c=2.2054;
+    Ctot=a*Cap^2+b*Cap+c;
+endfunction
+
+// Total generated energy and needed capacity
+function [Etot]=TotalEnergy2(H, Cap)
+Etot=0;
+i=1;
+for t=0:0.01:1
+    Etot=Etot+energy2(H,Cap,t);
+end
+endfunction
+
+// Function to be optimized
+function [y]=ga_f(x)
+    // Total generated energy
+    Etot=-TotalEnergy2(x(1),x(2));
+    // Investment cost
+    Ctot=-investment2(x(2));
+    y(1,1)=Etot;
+    y(1,2)=Ctot;
+endfunction
+
+//// NSGA-I ALGORITHM
+PopSize     = 200;  // The size of the population of individuals.
+Proba_cross = 0.5;  // The crossover probability.
+Proba_mut   = 0.3;  // The mutation probability.
+NbGen       = 15;    // The number of generations to be computed.
+NbCouples   = 110;  // The number of couples which will be selected so as to perform the crossover and mutation.
+Log         = %T;   // Will call the output function at the end of each iteration.
+nb_disp     = 10;   // Nb point to display from the optimal population.
+pressure    = 0.1;  // The value the efficiency of the worst individual.
+CapMax=generation2(flow(0),1100,99999999999999);    // Maximum possible installed capacity [MW]
+
+ga_params = init_param();
+ga_params = add_param(ga_params,'dimension',2);
+ga_params = add_param(ga_params,'minbound',[1.5,0]);
+ga_params = add_param(ga_params,'maxbound',[1100,CapMax]);
+
+[pop_opt,fobj_pop_opt,pop_init,fobj_pop_init] = optim_nsga(ga_f,PopSize,NbGen,Proba_mut,Proba_cross,Log,ga_params)
+t=toc()
+
+// Basic statistics
+for i=1:PopSize
+     pop(i,:)=pop_opt(i);
+     fobj(i,:)=fobj_pop_opt(i,:);
+end
+// Hydraulic heigth [m]
+MeanX1=mean(pop(:,1));
+DesvStdX1=stdev(pop(:,1));
+// Installed capacity [MW]
+MeanX2=mean(pop(:,2));
+DesvStdX2=stdev(pop(:,2));
+// Energy produced [MWh]
+MeanRes1=mean(fobj(:,1));
+DesvStdRes1=stdev(fobj(:,1));
+// Investment costs
+MeanRes2=mean(fobj(:,2));
+DesvStdRes2=stdev(fobj(:,2));
+
+disp('Basic statistics')
+disp('Optimal Hydraulic height [m] (mean):')
+disp(MeanX1);
+disp('Optimal Hydraulic height [m] (stdev):')
+disp(DesvStdX1);
+disp('Optimal installed capacity [MW] (mean):')
+disp(MeanX2);
+disp('Optimal installed capacity [MW] (stdev):')
+disp(DesvStdX2);
+disp('Optimal generated energy [MWh] (mean):')
+disp(MeanRes1);
+disp('Optimal generated energy [MWh] (stdev):')
+disp(DesvStdRes1);
+disp('Optimal investment costs [monetary units] (mean):')
+disp(MeanRes2);
+disp('Optimal investment costs [monetary units] (stdev):')
+disp(DesvStdRes2);
+
+disp('Script runtime [s]');
+disp(t);
+
+// Compute Pareto front and filter 
+[f_pareto,pop_pareto] = pareto_filter(fobj_pop_opt,pop_opt);
+// Plot solution: Pareto front 
+scf(1);
+// Plotting initial population
+plot(fobj_pop_init(:,1),fobj_pop_init(:,2),'r.');
+// Plotting Pareto population 
+plot(f_pareto(:,1),f_pareto(:,2),'k.');
+// Plotting final population 
+plot(fobj_pop_opt(:,1),fobj_pop_opt(:,2),'g.'); 
+title("Pareto front - NSGA","fontsize",5); 
+xlabel("$f_1=-E_{tot}$","fontsize",4); 
+ylabel("$f_2=-C_{tot}$","fontsize",4); 
+legend(['Initial pop.','Pareto pop.','Final pop.']);
+
+// Transform list to vector for plotting Pareto set 
+dim=2;
+npop = length(pop_opt); 
+npopinit = length(pop_init); 
+nfpop = length(pop_pareto);
+pop_init2 = matrix(list2vec(pop_init),dim,npopinit)';  
+pop_opt = matrix(list2vec(pop_opt),dim,npop)'; 
+pop_pareto = matrix(list2vec(pop_pareto),dim,nfpop)';
+
+// Plot the Pareto set 
+scf(2); 
+// Plotting initial population
+plot(pop_init2(:,1),pop_init2(:,2),'r.');
+// Plotting Pareto population 
+plot(pop_pareto(:,1),pop_pareto(:,2),'k.'); 
+// Plotting final population 
+plot(pop_opt(:,1),pop_opt(:,2),'g.'); 
+title("Pareto Set - NSGA","fontsize",5); 
+xlabel("$x_1=H$","fontsize",4); 
+ylabel("$x_2=Cap$","fontsize",4); 
+legend(['Initial pop.','Pareto pop.','Final pop.']);
+
+NSGA-II Script for Scilab 6.0.0 Editor 
+(simplified scripted standardized test MOP in the MOEAs-KAS-F-REPPs)
+
+//Script inicialization
+clear
+clc
+
+tic()
+// Flow duration curve
+function [Q]=flow(t)
+    // t is duration in %.
+    a=-10.904;
+    b=26.854;
+    c=-21.72;
+    d=5.8299;
+    Q=a*t^3+b*t^2+c*t+d;
+endfunction
+
+// Power plant generation potential
+function [P]=generation2(Q, H, Cap)
+    EffTransf=0.98; // Efficiency of transformers.
+    EffGen=0.95;    // Efficiency of generators.
+    EffTurb=0.90;   // Efficiency of turbines.
+    g=9.81;         // Earth gravity.
+    P=EffTransf*EffGen*EffTurb*g*Q*H;
+    if P>Cap then
+        P=Cap;
+    end
+endfunction
+
+// Instant energy generation
+function [E]=energy2(H, Cap, t)
+    Q=flow(t);
+    P=generation2(Q,H,Cap);
+    E=P*t;
+endfunction
+
+// Initial investment cost
+function [Ctot]=investment2(Cap)
+    a=-0.146;
+    b=4.2918;
+    c=2.2054;
+    Ctot=a*Cap^2+b*Cap+c;
+endfunction
+
+// Total generated energy and needed capacity
+function [Etot]=TotalEnergy2(H, Cap)
+Etot=0;
+i=1;
+for t=0:0.01:1
+    Etot=Etot+energy2(H,Cap,t);
+end
+endfunction
+
+// Function to be optimized
+function [y]=ga_f(x)
+    // Total generated energy
+    Etot=-TotalEnergy2(x(1),x(2));
+    // Investment cost
+    Ctot=-investment2(x(2));
+    y(1,1)=Etot;
+    y(1,2)=Ctot;
+endfunction
+
+//// NSGA-II ALGORITHM
+PopSize     = 200;  // The size of the population of individuals.
+Proba_cross = 0.5;  // The crossover probability.
+Proba_mut   = 0.3;  // The mutation probability.
+NbGen       = 15;    // The number of generations to be computed.
+NbCouples   = 110;  // The number of couples which will be selected so as to perform the crossover and mutation.
+Log         = %T;   // Will call the output function at the end of each iteration.
+nb_disp     = 10;   // Nb point to display from the optimal population.
+pressure    = 0.1;  // The value the efficiency of the worst individual.
+CapMax=generation2(flow(0),1100,99999999999999);    // Maximum possible installed capacity [MW]
+
+ga_params = init_param();
+ga_params = add_param(ga_params,'dimension',2);
+ga_params = add_param(ga_params,'minbound',[1.5,0]);
+ga_params = add_param(ga_params,'maxbound',[1100,CapMax]);
+
+[pop_opt,fobj_pop_opt,pop_init,fobj_pop_init] = optim_nsga2(ga_f,PopSize,NbGen,Proba_mut,Proba_cross,Log,ga_params)
+t=toc()
+
+// Basic statistics
+for i=1:PopSize
+     pop(i,:)=pop_opt(i);
+     fobj(i,:)=fobj_pop_opt(i,:);
+end
+// Hydraulic heigth [m]
+MeanX1=mean(pop(:,1));
+DesvStdX1=stdev(pop(:,1));
+// Installed capacity [MW]
+MeanX2=mean(pop(:,2));
+DesvStdX2=stdev(pop(:,2));
+// Energy produced [MWh]
+MeanRes1=mean(fobj(:,1));
+DesvStdRes1=stdev(fobj(:,1));
+// Investment costs
+MeanRes2=mean(fobj(:,2));
+DesvStdRes2=stdev(fobj(:,2));
+
+disp('Basic statistics')
+disp('Optimal Hydraulic height [m] (mean):')
+disp(MeanX1);
+disp('Optimal Hydraulic height [m] (stdev):')
+disp(DesvStdX1);
+disp('Optimal installed capacity [MW] (mean):')
+disp(MeanX2);
+disp('Optimal installed capacity [MW] (stdev):')
+disp(DesvStdX2);
+disp('Optimal generated energy [MWh] (mean):')
+disp(MeanRes1);
+disp('Optimal generated energy [MWh] (stdev):')
+disp(DesvStdRes1);
+disp('Optimal investment costs [monetary units] (mean):')
+disp(MeanRes2);
+disp('Optimal investment costs [monetary units] (stdev):')
+disp(DesvStdRes2);
+
+disp('Script runtime [s]');
+disp(t);
+
+// Compute Pareto front and filter 
+[f_pareto,pop_pareto] = pareto_filter(fobj_pop_opt,pop_opt);
+// Plot solution: Pareto front 
+scf(1);
+// Plotting initial population
+plot(fobj_pop_init(:,1),fobj_pop_init(:,2),'r.');
+// Plotting Pareto population 
+plot(f_pareto(:,1),f_pareto(:,2),'k.');
+// Plotting final population 
+plot(fobj_pop_opt(:,1),fobj_pop_opt(:,2),'g.'); 
+title("Pareto front - NSGA-II","fontsize",5); 
+xlabel("$f_1=-E_{tot}$","fontsize",4); 
+ylabel("$f_2=-C_{tot}$","fontsize",4); 
+legend(['Initial pop.','Pareto pop.','Final pop.']);
+
+// Transform list to vector for plotting Pareto set 
+dim=2;
+npop = length(pop_opt); 
+npopinit = length(pop_init); 
+nfpop = length(pop_pareto);
+pop_init2 = matrix(list2vec(pop_init),dim,npopinit)';  
+pop_opt = matrix(list2vec(pop_opt),dim,npop)'; 
+pop_pareto = matrix(list2vec(pop_pareto),dim,nfpop)';
+
+// Plot the Pareto set 
+scf(2); 
+// Plotting initial population
+plot(pop_init2(:,1),pop_init2(:,2),'r.');
+// Plotting Pareto population 
+plot(pop_pareto(:,1),pop_pareto(:,2),'k.'); 
+// Plotting final population 
+plot(pop_opt(:,1),pop_opt(:,2),'g.'); 
+title("Pareto Set - NSGA-II","fontsize",5); 
+xlabel("$x_1=H$","fontsize",4); 
+ylabel("$x_2=Cap$","fontsize",4); 
+legend(['Initial pop.','Pareto pop.','Final pop.']);
+
+
