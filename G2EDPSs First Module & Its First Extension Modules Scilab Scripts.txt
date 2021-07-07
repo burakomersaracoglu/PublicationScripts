@@ -1,0 +1,248 @@
+GGED-SS-C-T1MFIS7TMF-2VPGATA-100YPP-2015
+Scilab 5.5.2 Script For Core Model
+***************************************************************************
+Smallest Of Max
+***************************************************************************
+// COREMODULE1: Type 1 Mamdani-Like Fuzzy Inference Systems 7 Triangular Membership Functions min t-norm max t-conorm or s-norm Fuzzy Toolbox 0.4.6 Scilab 5.5.2 SciFLT Model 
+COREMODULE1=newfls(); 
+COREMODULE1.name="Global Grid Electricity Demand Prediction System G2EDPS Core Module 1"; 
+COREMODULE1.comment="Global Grid Electricity Demand Prediction System Core Module 1 Model Side By Side Level Approach Type 1 Mamdani-Like Fuzzy Inference System With 7 Same Triangle Membership Functions For Inputs Population Global Annual Temperature Anomalies Development In 2016"; 
+COREMODULE1.type="m"; 
+COREMODULE1.SNorm="asum"; 
+COREMODULE1.TNorm="aprod"; 
+COREMODULE1.Comp="one"; 
+COREMODULE1.ImpMethod="prod"; 
+COREMODULE1.AggMethod="max"; 
+// all defuzzification methods will be applied one by one! 
+COREMODULE1.defuzzMethod="som";
+// first variable is world population 1990-2090  historical and projection
+COREMODULE1=addvar(COREMODULE1,"input","world population",[5320817 12718194]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very very low","trimf",[5320817 5320817 6553713]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very low","trimf",[5320817 6553713 7786609]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"low","trimf",[6553713 7786609 9019505]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"moderate","trimf",[7786609 9019505 10252401]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"high","trimf",[9019505 10252401 11485298]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very high","trimf",[10252401 11485298 12718194]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very very high","trimf",[11485298 12718194 12718194]); 
+// second variable is global annual temperature anomalies 1990-2090 historical and projection
+COREMODULE1=addvar(COREMODULE1,"input","global annual temperature anomalies",[0.15 4.81]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"almost the same","trimf",[0.15 0.15 0.93]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"fairly hotter","trimf",[0.15 0.93 1.71]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"rather hotter","trimf",[0.93 1.71 2.48]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"hotter","trimf",[1.71 2.48 3.26]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"very hotter","trimf",[2.48 3.26 4.03]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"very very hotter","trimf",[3.26 4.03 4.81]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"extremely hotter","trimf",[4.03 4.81 4.81]); 
+//output variable is annual electricity demand of Global Grid  TWh 1990-2010 historical
+// projection is calculated by this module 2015-2090 with 5 to 10 years periods
+COREMODULE1=addvar(COREMODULE1,"output","annual electricity demand of Global Grid (TWh)",[102569 325730]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"very very low","trimf",[102569 102569 139762]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"very low","trimf",[102569 139762 176956]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"low","trimf",[139762 176956 214149]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"moderate","trimf",[176956 214149 251343]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"high","trimf",[214149 251343 288536]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"very high","trimf",[251343 288536 325730]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"very very high","trimf",[288536 325730 325730]);
+scf();clf();
+plotvar(COREMODULE1,"input",[1 2]);
+scf();clf();
+plotvar(COREMODULE1,"output",1);
+COREMODULE1=addrule(COREMODULE1,[ 1 1 1 1 1; 1 2 1 1 1; 1 3 1 1 1; 1 4 1 1 1; 1 5 2 1 1; 1 6 2 1 1; 1 7 2 1 1; 2 1 2 1 1; 2 2 2 1 1; 2 3 2 1 1; 2 4 2 1 1; 2 5 3 1 1; 2 6 3 1 1; 2 7 3 1 1; 3 1 3 1 1; 3 2 3 1 1; 3 3 3 1 1; 3 4 3 1 1; 3 5 4 1 1; 3 6 4 1 1; 3 7 4 1 1; 4 1 4 1 1; 4 2 4 1 1; 4 3 4 1 1; 4 4 4 1 1; 4 5 5 1 1; 4 6 5 1 1; 4 7 5 1 1; 5 1 5 1 1; 5 2 5 1 1; 5 3 5 1 1; 5 4 5 1 1; 5 5 6 1 1; 5 6 6 1 1; 5 7 6 1 1; 6 1 6 1 1; 6 2 6 1 1; 6 3 6 1 1; 6 4 6 1 1; 6 5 7 1 1; 6 6 7 1 1; 6 7 7 1 1; 7 1 7 1 1; 7 2 7 1 1; 7 3 7 1 1; 7 4 7 1 1; 7 5 7 1 1; 7 6 7 1 1; 7 7 7 1 1])
+printrule(COREMODULE1);
+***************************************************************************
+Mean Of Max
+***************************************************************************
+// COREMODULE1: Type 1 Mamdani-Like Fuzzy Inference Systems 7 Triangular Membership Functions min t-norm max t-conorm or s-norm Fuzzy Toolbox 0.4.6 Scilab 5.5.2 SciFLT Model 
+COREMODULE1=newfls(); 
+COREMODULE1.name="Global Grid Electricity Demand Prediction System G2EDPS Core Module 1"; 
+COREMODULE1.comment="Global Grid Electricity Demand Prediction System Core Module 1 Model Side By Side Level Approach Type 1 Mamdani-Like Fuzzy Inference System With 7 Same Triangle Membership Functions For Inputs Population Global Annual Temperature Anomalies Development In 2016"; 
+COREMODULE1.type="m"; 
+COREMODULE1.SNorm="asum"; 
+COREMODULE1.TNorm="aprod"; 
+COREMODULE1.Comp="one"; 
+COREMODULE1.ImpMethod="prod"; 
+COREMODULE1.AggMethod="max"; 
+// all defuzzification methods will be applied one by one! 
+COREMODULE1.defuzzMethod="mom";
+// first variable is world population 1990-2090  historical and projection
+COREMODULE1=addvar(COREMODULE1,"input","world population",[5320817 12718194]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very very low","trimf",[5320817 5320817 6553713]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very low","trimf",[5320817 6553713 7786609]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"low","trimf",[6553713 7786609 9019505]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"moderate","trimf",[7786609 9019505 10252401]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"high","trimf",[9019505 10252401 11485298]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very high","trimf",[10252401 11485298 12718194]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very very high","trimf",[11485298 12718194 12718194]); 
+// second variable is global annual temperature anomalies 1990-2090 historical and projection
+COREMODULE1=addvar(COREMODULE1,"input","global annual temperature anomalies",[0.15 4.81]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"almost the same","trimf",[0.15 0.15 0.93]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"fairly hotter","trimf",[0.15 0.93 1.71]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"rather hotter","trimf",[0.93 1.71 2.48]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"hotter","trimf",[1.71 2.48 3.26]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"very hotter","trimf",[2.48 3.26 4.03]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"very very hotter","trimf",[3.26 4.03 4.81]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"extremely hotter","trimf",[4.03 4.81 4.81]); 
+//output variable is annual electricity demand of Global Grid  TWh 1990-2010 historical
+// projection is calculated by this module 2015-2090 with 5 to 10 years periods
+COREMODULE1=addvar(COREMODULE1,"output","annual electricity demand of Global Grid (TWh)",[102569 325730]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"very very low","trimf",[102569 102569 139762]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"very low","trimf",[102569 139762 176956]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"low","trimf",[139762 176956 214149]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"moderate","trimf",[176956 214149 251343]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"high","trimf",[214149 251343 288536]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"very high","trimf",[251343 288536 325730]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"very very high","trimf",[288536 325730 325730]);
+scf();clf();
+plotvar(COREMODULE1,"input",[1 2]);
+scf();clf();
+plotvar(COREMODULE1,"output",1);
+COREMODULE1=addrule(COREMODULE1,[ 1 1 1 1 1; 1 2 1 1 1; 1 3 1 1 1; 1 4 1 1 1; 1 5 2 1 1; 1 6 2 1 1; 1 7 2 1 1; 2 1 2 1 1; 2 2 2 1 1; 2 3 2 1 1; 2 4 2 1 1; 2 5 3 1 1; 2 6 3 1 1; 2 7 3 1 1; 3 1 3 1 1; 3 2 3 1 1; 3 3 3 1 1; 3 4 3 1 1; 3 5 4 1 1; 3 6 4 1 1; 3 7 4 1 1; 4 1 4 1 1; 4 2 4 1 1; 4 3 4 1 1; 4 4 4 1 1; 4 5 5 1 1; 4 6 5 1 1; 4 7 5 1 1; 5 1 5 1 1; 5 2 5 1 1; 5 3 5 1 1; 5 4 5 1 1; 5 5 6 1 1; 5 6 6 1 1; 5 7 6 1 1; 6 1 6 1 1; 6 2 6 1 1; 6 3 6 1 1; 6 4 6 1 1; 6 5 7 1 1; 6 6 7 1 1; 6 7 7 1 1; 7 1 7 1 1; 7 2 7 1 1; 7 3 7 1 1; 7 4 7 1 1; 7 5 7 1 1; 7 6 7 1 1; 7 7 7 1 1])
+printrule(COREMODULE1);
+***************************************************************************
+Bisector
+***************************************************************************
+// COREMODULE1: Type 1 Mamdani-Like Fuzzy Inference Systems 7 Triangular Membership Functions min t-norm max t-conorm or s-norm Fuzzy Toolbox 0.4.6 Scilab 5.5.2 SciFLT Model 
+COREMODULE1=newfls(); 
+COREMODULE1.name="Global Grid Electricity Demand Prediction System G2EDPS Core Module 1"; 
+COREMODULE1.comment="Global Grid Electricity Demand Prediction System Core Module 1 Model Side By Side Level Approach Type 1 Mamdani-Like Fuzzy Inference System With 7 Same Triangle Membership Functions For Inputs Population Global Annual Temperature Anomalies Development In 2016"; 
+COREMODULE1.type="m"; 
+COREMODULE1.SNorm="asum"; 
+COREMODULE1.TNorm="aprod"; 
+COREMODULE1.Comp="one"; 
+COREMODULE1.ImpMethod="prod"; 
+COREMODULE1.AggMethod="max"; 
+// all defuzzification methods will be applied one by one! 
+COREMODULE1.defuzzMethod="bisector";
+// first variable is world population 1990-2090  historical and projection
+COREMODULE1=addvar(COREMODULE1,"input","world population",[5320817 12718194]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very very low","trimf",[5320817 5320817 6553713]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very low","trimf",[5320817 6553713 7786609]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"low","trimf",[6553713 7786609 9019505]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"moderate","trimf",[7786609 9019505 10252401]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"high","trimf",[9019505 10252401 11485298]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very high","trimf",[10252401 11485298 12718194]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very very high","trimf",[11485298 12718194 12718194]); 
+// second variable is global annual temperature anomalies 1990-2090 historical and projection
+COREMODULE1=addvar(COREMODULE1,"input","global annual temperature anomalies",[0.15 4.81]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"almost the same","trimf",[0.15 0.15 0.93]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"fairly hotter","trimf",[0.15 0.93 1.71]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"rather hotter","trimf",[0.93 1.71 2.48]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"hotter","trimf",[1.71 2.48 3.26]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"very hotter","trimf",[2.48 3.26 4.03]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"very very hotter","trimf",[3.26 4.03 4.81]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"extremely hotter","trimf",[4.03 4.81 4.81]); 
+//output variable is annual electricity demand of Global Grid  TWh 1990-2010 historical
+// projection is calculated by this module 2015-2090 with 5 to 10 years periods
+COREMODULE1=addvar(COREMODULE1,"output","annual electricity demand of Global Grid (TWh)",[102569 325730]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"very very low","trimf",[102569 102569 139762]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"very low","trimf",[102569 139762 176956]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"low","trimf",[139762 176956 214149]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"moderate","trimf",[176956 214149 251343]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"high","trimf",[214149 251343 288536]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"very high","trimf",[251343 288536 325730]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"very very high","trimf",[288536 325730 325730]);
+scf();clf();
+plotvar(COREMODULE1,"input",[1 2]);
+scf();clf();
+plotvar(COREMODULE1,"output",1);
+COREMODULE1=addrule(COREMODULE1,[ 1 1 1 1 1; 1 2 1 1 1; 1 3 1 1 1; 1 4 1 1 1; 1 5 2 1 1; 1 6 2 1 1; 1 7 2 1 1; 2 1 2 1 1; 2 2 2 1 1; 2 3 2 1 1; 2 4 2 1 1; 2 5 3 1 1; 2 6 3 1 1; 2 7 3 1 1; 3 1 3 1 1; 3 2 3 1 1; 3 3 3 1 1; 3 4 3 1 1; 3 5 4 1 1; 3 6 4 1 1; 3 7 4 1 1; 4 1 4 1 1; 4 2 4 1 1; 4 3 4 1 1; 4 4 4 1 1; 4 5 5 1 1; 4 6 5 1 1; 4 7 5 1 1; 5 1 5 1 1; 5 2 5 1 1; 5 3 5 1 1; 5 4 5 1 1; 5 5 6 1 1; 5 6 6 1 1; 5 7 6 1 1; 6 1 6 1 1; 6 2 6 1 1; 6 3 6 1 1; 6 4 6 1 1; 6 5 7 1 1; 6 6 7 1 1; 6 7 7 1 1; 7 1 7 1 1; 7 2 7 1 1; 7 3 7 1 1; 7 4 7 1 1; 7 5 7 1 1; 7 6 7 1 1; 7 7 7 1 1])
+printrule(COREMODULE1);
+***************************************************************************
+Centroide
+***************************************************************************
+// COREMODULE1: Type 1 Mamdani-Like Fuzzy Inference Systems 7 Triangular Membership Functions min t-norm max t-conorm or s-norm Fuzzy Toolbox 0.4.6 Scilab 5.5.2 SciFLT Model 
+COREMODULE1=newfls(); 
+COREMODULE1.name="Global Grid Electricity Demand Prediction System G2EDPS Core Module 1"; 
+COREMODULE1.comment="Global Grid Electricity Demand Prediction System Core Module 1 Model Side By Side Level Approach Type 1 Mamdani-Like Fuzzy Inference System With 7 Same Triangle Membership Functions For Inputs Population Global Annual Temperature Anomalies Development In 2016"; 
+COREMODULE1.type="m"; 
+COREMODULE1.SNorm="asum"; 
+COREMODULE1.TNorm="aprod"; 
+COREMODULE1.Comp="one"; 
+COREMODULE1.ImpMethod="prod"; 
+COREMODULE1.AggMethod="max"; 
+// all defuzzification methods will be applied one by one! 
+COREMODULE1.defuzzMethod="centroide";
+// first variable is world population 1990-2090  historical and projection
+COREMODULE1=addvar(COREMODULE1,"input","world population",[5320817 12718194]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very very low","trimf",[5320817 5320817 6553713]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very low","trimf",[5320817 6553713 7786609]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"low","trimf",[6553713 7786609 9019505]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"moderate","trimf",[7786609 9019505 10252401]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"high","trimf",[9019505 10252401 11485298]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very high","trimf",[10252401 11485298 12718194]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very very high","trimf",[11485298 12718194 12718194]); 
+// second variable is global annual temperature anomalies 1990-2090 historical and projection
+COREMODULE1=addvar(COREMODULE1,"input","global annual temperature anomalies",[0.15 4.81]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"almost the same","trimf",[0.15 0.15 0.93]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"fairly hotter","trimf",[0.15 0.93 1.71]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"rather hotter","trimf",[0.93 1.71 2.48]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"hotter","trimf",[1.71 2.48 3.26]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"very hotter","trimf",[2.48 3.26 4.03]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"very very hotter","trimf",[3.26 4.03 4.81]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"extremely hotter","trimf",[4.03 4.81 4.81]); 
+//output variable is annual electricity demand of Global Grid  TWh 1990-2010 historical
+// projection is calculated by this module 2015-2090 with 5 to 10 years periods
+COREMODULE1=addvar(COREMODULE1,"output","annual electricity demand of Global Grid (TWh)",[102569 325730]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"very very low","trimf",[102569 102569 139762]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"very low","trimf",[102569 139762 176956]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"low","trimf",[139762 176956 214149]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"moderate","trimf",[176956 214149 251343]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"high","trimf",[214149 251343 288536]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"very high","trimf",[251343 288536 325730]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"very very high","trimf",[288536 325730 325730]);
+scf();clf();
+plotvar(COREMODULE1,"input",[1 2]);
+scf();clf();
+plotvar(COREMODULE1,"output",1);
+COREMODULE1=addrule(COREMODULE1,[ 1 1 1 1 1; 1 2 1 1 1; 1 3 1 1 1; 1 4 1 1 1; 1 5 2 1 1; 1 6 2 1 1; 1 7 2 1 1; 2 1 2 1 1; 2 2 2 1 1; 2 3 2 1 1; 2 4 2 1 1; 2 5 3 1 1; 2 6 3 1 1; 2 7 3 1 1; 3 1 3 1 1; 3 2 3 1 1; 3 3 3 1 1; 3 4 3 1 1; 3 5 4 1 1; 3 6 4 1 1; 3 7 4 1 1; 4 1 4 1 1; 4 2 4 1 1; 4 3 4 1 1; 4 4 4 1 1; 4 5 5 1 1; 4 6 5 1 1; 4 7 5 1 1; 5 1 5 1 1; 5 2 5 1 1; 5 3 5 1 1; 5 4 5 1 1; 5 5 6 1 1; 5 6 6 1 1; 5 7 6 1 1; 6 1 6 1 1; 6 2 6 1 1; 6 3 6 1 1; 6 4 6 1 1; 6 5 7 1 1; 6 6 7 1 1; 6 7 7 1 1; 7 1 7 1 1; 7 2 7 1 1; 7 3 7 1 1; 7 4 7 1 1; 7 5 7 1 1; 7 6 7 1 1; 7 7 7 1 1])
+printrule(COREMODULE1);
+***************************************************************************
+largest of maximum
+***************************************************************************
+// COREMODULE1: Type 1 Mamdani-Like Fuzzy Inference Systems 7 Triangular Membership Functions min t-norm max t-conorm or s-norm Fuzzy Toolbox 0.4.6 Scilab 5.5.2 SciFLT Model 
+COREMODULE1=newfls(); 
+COREMODULE1.name="Global Grid Electricity Demand Prediction System G2EDPS Core Module 1"; 
+COREMODULE1.comment="Global Grid Electricity Demand Prediction System Core Module 1 Model Side By Side Level Approach Type 1 Mamdani-Like Fuzzy Inference System With 7 Same Triangle Membership Functions For Inputs Population Global Annual Temperature Anomalies Development In 2016"; 
+COREMODULE1.type="m"; 
+COREMODULE1.SNorm="asum"; 
+COREMODULE1.TNorm="aprod"; 
+COREMODULE1.Comp="one"; 
+COREMODULE1.ImpMethod="prod"; 
+COREMODULE1.AggMethod="max"; 
+// all defuzzification methods will be applied one by one! 
+COREMODULE1.defuzzMethod="lom";
+// first variable is world population 1990-2090  historical and projection
+COREMODULE1=addvar(COREMODULE1,"input","world population",[5320817 12718194]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very very low","trimf",[5320817 5320817 6553713]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very low","trimf",[5320817 6553713 7786609]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"low","trimf",[6553713 7786609 9019505]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"moderate","trimf",[7786609 9019505 10252401]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"high","trimf",[9019505 10252401 11485298]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very high","trimf",[10252401 11485298 12718194]); 
+COREMODULE1=addmf(COREMODULE1,"input",1,"very very high","trimf",[11485298 12718194 12718194]); 
+// second variable is global annual temperature anomalies 1990-2090 historical and projection
+COREMODULE1=addvar(COREMODULE1,"input","global annual temperature anomalies",[0.15 4.81]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"almost the same","trimf",[0.15 0.15 0.93]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"fairly hotter","trimf",[0.15 0.93 1.71]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"rather hotter","trimf",[0.93 1.71 2.48]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"hotter","trimf",[1.71 2.48 3.26]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"very hotter","trimf",[2.48 3.26 4.03]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"very very hotter","trimf",[3.26 4.03 4.81]); 
+COREMODULE1=addmf(COREMODULE1,"input",2,"extremely hotter","trimf",[4.03 4.81 4.81]); 
+//output variable is annual electricity demand of Global Grid  TWh 1990-2010 historical
+// projection is calculated by this module 2015-2090 with 5 to 10 years periods
+COREMODULE1=addvar(COREMODULE1,"output","annual electricity demand of Global Grid (TWh)",[102569 325730]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"very very low","trimf",[102569 102569 139762]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"very low","trimf",[102569 139762 176956]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"low","trimf",[139762 176956 214149]); 
+COREMODULE1=addmf(COREMODULE1,"output",1,"moderate","trimf",[176956 214149 251343]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"high","trimf",[214149 251343 288536]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"very high","trimf",[251343 288536 325730]);
+COREMODULE1=addmf(COREMODULE1,"output",1,"very very high","trimf",[288536 325730 325730]);
+scf();clf();
+plotvar(COREMODULE1,"input",[1 2]);
+scf();clf();
+plotvar(COREMODULE1,"output",1);
+COREMODULE1=addrule(COREMODULE1,[ 1 1 1 1 1; 1 2 1 1 1; 1 3 1 1 1; 1 4 1 1 1; 1 5 2 1 1; 1 6 2 1 1; 1 7 2 1 1; 2 1 2 1 1; 2 2 2 1 1; 2 3 2 1 1; 2 4 2 1 1; 2 5 3 1 1; 2 6 3 1 1; 2 7 3 1 1; 3 1 3 1 1; 3 2 3 1 1; 3 3 3 1 1; 3 4 3 1 1; 3 5 4 1 1; 3 6 4 1 1; 3 7 4 1 1; 4 1 4 1 1; 4 2 4 1 1; 4 3 4 1 1; 4 4 4 1 1; 4 5 5 1 1; 4 6 5 1 1; 4 7 5 1 1; 5 1 5 1 1; 5 2 5 1 1; 5 3 5 1 1; 5 4 5 1 1; 5 5 6 1 1; 5 6 6 1 1; 5 7 6 1 1; 6 1 6 1 1; 6 2 6 1 1; 6 3 6 1 1; 6 4 6 1 1; 6 5 7 1 1; 6 6 7 1 1; 6 7 7 1 1; 7 1 7 1 1; 7 2 7 1 1; 7 3 7 1 1; 7 4 7 1 1; 7 5 7 1 1; 7 6 7 1 1; 7 7 7 1 1])
+printrule(COREMODULE1);
+***************************************************************************
