@@ -1,0 +1,100 @@
+//Script for RStudio Version 0.99.491 Editor - load & matrices
+# Necessary packages that will be installed
+Needed <- c("rJava", "RWeka", "RWekajars","SnowballC", "tm", "ggplot2")
+# Install packages
+install.packages(Needed, dependencies=TRUE)
+# Stored files location on the hard disk
+long.term.collection<-file.path("C:/.......")
+long.term.collection
+# Check to see that loaded texts
+length(dir(long.term.collection))
+dir(long.term.collection)
+# Load the R packages for text mining
+library(rJava)
+library(RWeka)
+library(RWekajars)
+library(SnowballC)
+library(tm)
+getReaders()
+getSources()
+# Load texts into R
+long.term.collection.docs <- Corpus(DirSource(long.term.collection))
+# Check to see that loaded texts into R
+class(long.term.collection.docs)
+summary(long.term.collection.docs)
+inspect(long.term.collection.docs)
+# Perform simple transformation
+getTransformations()
+long.term.collection.docs<- tm_map(long.term.collection.docs, tolower)
+long.term.collection.docs<- tm_map(long.term.collection.docs, remove-Punctuation)
+long.term.collection.docs <- tm_map(long.term.collection.docs, remove-Numbers)
+length(stopwords("english"))
+stopwords("english")
+long.term.collection.docs<- tm_map(long.term.collection.docs, remove-Words, stopwords("english"))
+inspect(long.term.collection.docs)
+alphabet=c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
+long.term.collection.docs<- tm_map(long.term.collection.docs, remove-Words, alphabet)
+inspect(long.term.collection.docs)
+long.term.collection.docs<- tm_map(long.term.collection.docs, strip-Whitespace)
+# Perform stemming
+getStemLanguages()
+long.term.collection.docs<- tm_map(long.term.collection.docs, stemDoc-ument)
+# Perform plaintext conversion
+long.term.collection.docs<- tm_map(long.term.collection.docs, PlainTextDocument)
+inspect(long.term.collection.docs)
+# Create document term matrices
+long.term.collection.document.term.matrix<- DocumentTermMa-trix(long.term.collection.docs)
+inspect(long.term.collection.document.term.matrix)
+long.term.collection.docs.term.document.matrix<- TermDocumentMa-trix(long.term.collection.docs)
+inspect(long.term.collection.docs.term.document.matrix)
+long.term.collection<- as.matrix(long.term.collection.docs.term.document.matrix)
+# Set working directory
+setwd("C:/.............")
+getwd()
+# Write and export csv file into working directory
+write.csv(long.term.collection, file="R.long.term.collection.csv")
+
+
+
+//Script for RStudio Version 0.99.491 Editor - frequency & word cloud
+# Set working directory
+setwd("C:/..............")
+getwd()
+# Read CSV files
+long.term.collection.forecast.terms.R.TextSTAT <- read.csv(file="long.term.collection.forecast.terms.R.TextSTAT.csv", head=TRUE,sep=",")
+long.term.collection.forecast.terms.R.TextSTAT.above100<-read.csv(file="long.term.collection.forecast.terms.R.TextSTAT.above100.csv", head=TRUE,sep=",")
+long.term.collection.forecast.terms.R.TextSTAT.10to100<- read.csv(file="long.term.collection.forecast.terms.R.TextSTAT.10to100.csv", head=TRUE,sep=",")
+long.term.collection.forecast.terms.R.TextSTAT.below10<- read.csv(file="long.term.collection.forecast.terms.R.TextSTAT.below10.csv", head=TRUE,sep=",")
+# Show data at CSV files
+long.term.collection.forecast.terms.R.TextSTAT
+long.term.collection.forecast.terms.R.TextSTAT.above100
+long.term.collection.forecast.terms.R.TextSTAT.10to100
+long.term.collection.forecast.terms.R.TextSTAT.below10
+# Plot data
+plot(long.term.collection.forecast.terms.R.TextSTAT[,"terms"], long.term.collection.forecast.terms.R.TextSTAT[,"occurrences"])
+plot(long.term.collection.forecast.terms.R.TextSTAT.above100[,"terms"], long.term.collection.forecast.terms.R.TextSTAT.above100[,"occurrences"])
+plot(long.term.collection.forecast.terms.R.TextSTAT.10to100[,"terms"], long.term.collection.forecast.terms.R.TextSTAT.10to100[,"occurrences"])
+plot(long.term.collection.forecast.terms.R.TextSTAT.below10[,"terms"], long.term.collection.forecast.terms.R.TextSTAT.below10[,"occurrences"])
+# Plot data by ggplot2
+library(ggplot2)
+ggplot(long.term.collection.forecast.terms.R.TextSTAT,aes(x=terms,y=occurrenc-es))+geom_bar(stat="identity",fill="darkred",colour="darkgreen")+theme(axis.text.x=element_text(angle=90,hjust=1))
+# Word Cloud
+word.cloud<-file.path("C:/...............")
+length(dir(word.cloud))
+dir(word.cloud)
+library(tm)
+word.cloud.terms.R.TextSTAT <- Corpus(DirSource(word.cloud))
+summary(word.cloud.terms.R.TextSTAT)
+inspect(word.cloud.terms.R.TextSTAT)
+word.cloud.terms.R.TextSTAT.Document.Term <- DocumentTermMa-trix(word.cloud.terms.R.TextSTAT)
+inspect(word.cloud.terms.R.TextSTAT.Document.Term)
+word.cloud.terms.R.TextSTAT.Term.Document<- TermDocumentMa-trix(word.cloud.terms.R.TextSTAT)
+inspect(word.cloud.terms.R.TextSTAT.Term.Document)
+m<-as.matrix(word.cloud.terms.R.TextSTAT.Term.Document)
+v<-sort(rowSums(m),decreasing=TRUE)
+d<-data.frame(word = names(v),freq=v)
+library(wordcloud)
+set.seed(1234)
+wordcloud(words=d$word,freq=d$freq,scale=c(4,0.5),min.freq=1,max.words=Inf,random.order=FALSE,rot.per=0.35,colors=brewer.pal(8,"Dark2"))
+/////Note 1: "C:/............." directory or folder of the documents
+
