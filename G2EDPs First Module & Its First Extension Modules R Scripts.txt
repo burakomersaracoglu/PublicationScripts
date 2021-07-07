@@ -1,0 +1,30 @@
+R Scripts Of G2EDPS's First Module & Its First Extension Modules
+**********************************************************************************
+Historical
+**********************************************************************************
+Year.Historical=c(1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010)
+World.Electricity.Demand.TWh.Historical=c(102568.58,102762.80,103389.19,103742.74,105223.36,107857.67,110491.75,111914.91,113230.84,113442.28,116883.01,118784.87,119660.26,124600.45,130706.43,134904.51,138600.41,140662.99,143944.39,142981.08,149567.50)
+World.Electricity.Demand.TWh.Historical.Prediction.G2EDPS.CoreModuleSOM=c(102569.00,104800.61,104800.61,104800.61,104800.61,104800.61,104800.61,104800.61,140506.37,140506.37,140506.37,140506.37,140506.37,140506.37,140506.37,140506.37,140506.37,140506.37,140506.37,140506.37,140506.37)
+World.Electricity.Demand.TWh.Historical.Prediction.G2EDPS.CoreModuleSOM.Extension8=c(101187.6327,103389.1881,103389.1881,103389.1881,103389.1881,103389.1881,103389.1881,103389.1881,138614.0741,138614.0741,138614.0741,138614.0741,138614.0741,138614.0741,138614.0741,138614.0741,138614.0741,138614.0741,138614.0741,138614.0741,138614.0741)
+plot(Year.Historical, World.Electricity.Demand.TWh.Historical, xlab="Year (historical)", ylab="World Electricity Demand (TWh) (historical)", pch=1, col="darkgreen")
+points(Year.Historical,World.Electricity.Demand.TWh.Historical.Prediction.G2EDPS.CoreModuleSOM, pch=2, col="green")
+points(Year.Historical,World.Electricity.Demand.TWh.Historical.Prediction.G2EDPS.CoreModuleSOM.Extension8, pch=3, col="green")
+legend(1990,135000,c("World Electricity Demand (TWh) (historical)","Prediction G2EDPS Core Module SOM"," Prediction G2EDPS Core Module Extension 8"),col=c(1,2,3),pch=c(1,2,3))
+**********************************************************************************
+Prediction
+**********************************************************************************
+Year.Prediction=c(2015,2020,2030,2040,2050,2060,2070,2080,2090)
+World.Electricity.Demand.TWh.Prediction=c(176212,176212,176212,214150,214150,214150,252087,252087,214150)
+plot(Year.Prediction, World.Electricity.Demand.TWh.Prediction, xlab="Year (prediction)", ylab="World Electricity Demand (TWh) (prediction)", pch=1, col="blue")
+points(Year.Prediction,World.Electricity.Demand.TWh.Prediction, pch=3, col="blue")
+legend(2020,200000,c("World Electricity Demand (TWh)(prediction)"),col=c(4),pch=c(3))
+**********************************************************************************
+
+
+
+
+
+
+
+
+
