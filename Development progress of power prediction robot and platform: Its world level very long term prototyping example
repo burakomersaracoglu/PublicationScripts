@@ -1,0 +1,1951 @@
+# RStudio script (long version).
+# Developer’s long version of Global Power Prediction Systems (GP2S/G2PS/GPPS) - Global Power Consumption Prediction Systems (GPCPS) robot prototype version 2021.
+# Please feel free to copy, paste, use and/or manipulate any part of this script, and cite it. You are encouraged to do so.
+# Aim: Robot for prediction of electricity and power consumption (demand) and generation (production). 
+# Research: Robot of Global Power Prediction Systems - Global Power Consumption Prediction Systems prototype version 2021 (prototype version 2021: 2018-2021 studies) before research on the prototype versions of servers, cloud servers, and web applications. 
+# Researcher: Burak Omer Saracoglu (Turkiye).
+# Dataset: Robot dataset 2021 by researcher’s own work. Year 1971-2018. Please feel free to copy, paste, use and/or manipulate any part of this dataset and cite it. You are encouraged to do so.
+# Software: R version 4.1.1 (2021-08-10) -- "Kick Things", RStudio 2021.09.0+351 "Ghost Orchid" Release 
+# Dependencies: 3rd party Tidyverse 1.3.1, Tidymodels 0.1.4, ggExtra 0.9, forecast 8.15 packages and base built-in lm function, glm function
+# Dependency degree: 2 free open source software environments, 2 base functions and 3 contributed packages (related functions) with their dependencies
+# Total lines of code: 2500
+# Total executable lines of code: 
+# Total primary executable lines of code: 
+
+# Start RStudio 2021.09.0+351 "Ghost Orchid" Release as “Run as administrator” on your PC (task of the user, you)
+
+# Save datasets RDGP2SWorld19712018Blank, RDGP2SWorld19712018Comma, RDGP2SWorld19712018Semicolon, and RDGP2SWorld19712018Tab *txt, *.csv, and *.tsv files into your folder (working directory) in your PC (task of the user, you)
+# If the publisher has revised and presented the titles of those data files according to its standards, please revise them as the titles above or revise this script with the new titles (task of the user, you).
+
+
+
+# Code/script block 1
+# Clear plots, console, workspace
+rm(list=ls())
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Learn working directory 
+getwd()
+# Set working directory 
+setwd("/ADD YOUR WORKING DIRECTORY ON THIS LINE")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+
+
+# Code/script block 2
+# If packages tidyverse, tidymodels, ggExtra are installed, skip this code/script block 2
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Install all required packages at once automatically
+install.packages("tidyverse", dependencies = TRUE)
+install.packages("tidymodels", dependencies = TRUE)
+install.packages("ggExtra", dependencies = TRUE)
+install.packages("forecast", dependencies = TRUE)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+# Note
+# package ‘tidyverse’ successfully unpacked and MD5 sums checked
+# package ‘tidymodels’ successfully unpacked and MD5 sums checked
+# package ‘ggExtra’ successfully unpacked and MD5 sums checked
+# package ‘forecast’ successfully unpacked and MD5 sums checked
+# References, additional info, etc.
+# https://github.com/tidyverse/tidyverse
+# https://cran.r-project.org/web/packages/tidyverse/index.html
+# https://cran.r-project.org/web/packages/tidyverse/tidyverse.pdf
+# https://github.com/tidymodels
+# https://cran.r-project.org/web/packages/tidymodels/index.html
+# https://cran.r-project.org/web/packages/tidymodels/tidymodels.pdf
+# https://github.com/daattali/ggExtra
+# https://cran.r-project.org/web/packages/ggExtra/vignettes/ggExtra.html
+# https://cran.r-project.org/web/packages/ggExtra/ggExtra.pdf
+# https://github.com/robjhyndman/forecast
+# https://cran.r-project.org/web/packages/forecast/index.html
+# https://cran.r-project.org/web/packages/forecast/forecast.pdf
+
+
+
+# Code/script block 3
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Call all required packages at once automatically
+library(forecast)
+library(tidyverse)
+library(tidymodels)
+library(vroom)
+library(ggExtra)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+# Note
+# Registered S3 method overwritten by 'quantmod': method from as.zoo.data.frame zoo
+# Registered S3 method overwritten by 'tune': method from required_pkgs.model_spec parsnip
+# References, additional info, etc.
+# https://stackoverflow.com/questions/39137110/what-does-the-following-object-is-masked-from-packagexxx-mean
+
+
+
+# Code/script block 4
+# List files in GP2SWorld19712018 directory and see the files names *checkpoint*
+list.files("/ADD YOUR WORKING DIRECTORY ON THIS LINE")
+# Load data on the hard disk automatically
+# Data import as dataframe/tidyverse tibbles (default decimal separation in R and RStudio is point). Due to different decimal separator standards in different countries like the US and Europe.
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Load data on the harddisk by read_csv():comma delimited csv file 
+GP2SWorldCommaCSV <- readr::read_csv(("RDGP2SWorld19712018Comma.csv"), col_names = TRUE)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Load data on the harddisk by read_csv2():semicolon delimited csv file
+GP2SWorldSemicolonCSV <- readr::read_csv2(("RDGP2SWorld19712018Semicolon.csv"), col_names = TRUE)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Load data on the harddisk by read_tsv():tab delimited file tsv file
+GP2SWorld19712018TabTSV <- readr::read_tsv(("RDGP2SWorld19712018Tab.tsv"), col_names = TRUE)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Load data on the harddisk by read_delim(): blank delimited txt file
+GP2SWorld19712018BlankDelimTXT <- readr::read_delim(("RDGP2SWorld19712018Blank.txt"), col_names = TRUE)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Load data on the harddisk by read_table():blank delimited txt file
+GP2SWorld19712018BlankTableTXT <- readr::read_table(("RDGP2SWorld19712018Blank.txt"), col_names = TRUE)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Load data on the harddisk vroom():comma delimited csv file
+GP2SWorld19712018CommaCSVVroom <- vroom::vroom(("RDGP2SWorld19712018Comma.csv"), col_names = TRUE)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Load data on the harddisk vroom():semicolon delimited csv file
+GP2SWorld19712018SemicolonCSVVroom <- vroom::vroom(("RDGP2SWorld19712018Semicolon.csv"), delim = ";", col_names = TRUE)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Load data on the harddisk vroom():tab delimited file tsv file
+GP2SWorld19712018TabVroom <- vroom::vroom(("RDGP2SWorld19712018Tab.tsv"), col_names = TRUE)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Assign dataframe/tidyverse tibbles
+GP2SWorld <- GP2SWorldCommaCSV
+# References, additional info, etc.
+# https://readr.tidyverse.org/index.html
+# https://www.tidyverse.org/blog/2019/05/vroom-1-0-0/#vroom-vs-readr
+# https://www.danielecook.com/speeding-up-reading-and-writing-in-r/ 
+# https://vroom.r-lib.org/index.html
+
+
+
+# Code/script block 5
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Show problems of dataframe/tidyverse tibbles and see the problems
+GP2SWorld %>%
+   problems()
+# Structure of dataframe/tidyverse tibbles
+GP2SWorld %>%
+   str()
+# Print dataframe/tidyverse tibbles *checkpoint*
+GP2SWorld %>%
+   print()
+# View dataframe/tidyverse tibbles *checkpoint*
+GP2SWorld %>%
+   view()
+# Summary of dataframe/tidyverse tibbles *checkpoint*
+GP2SWorld %>%
+   summary()
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+
+
+# Code/script block 6
+# Exploratory Data Analysis (EDA)
+# Summary descriptive statistics
+# Print summary descriptive statistics with tidyverse, print and save them into the folder
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Minimum Electricity Consumption(kWh)summary descriptive statistics
+StatisticsMinimumElectricityConsumption <- GP2SWorld %>%
+dplyr::summarize(n = n(), MinMinimumElectricityConsumption = min(MinimumElectricityConsumptionkWh, na.rm = TRUE), FirstQuartileMinimumElectricityConsumption = quantile(MinimumElectricityConsumptionkWh, 0.25, na.rm = TRUE), MedianMinimumElectricityConsumption = median(MinimumElectricityConsumptionkWh, na.rm = TRUE), MeanMinimumElectricityConsumption = mean(MinimumElectricityConsumptionkWh, na.rm = TRUE), ThirdQuartileMinimumElectricityConsumption = quantile(MinimumElectricityConsumptionkWh, 0.75, na.rm = TRUE), MaxMinimumElectricityConsumption = max(MinimumElectricityConsumptionkWh, na.rm = TRUE), StdDevMinimumElectricityConsumption = sd(MinimumElectricityConsumptionkWh, na.rm = TRUE), IQRMinimumElectricityConsumption = IQR(MinimumElectricityConsumptionkWh, na.rm = TRUE), RangeMinimumElectricityConsumption = max(MinimumElectricityConsumptionkWh, na.rm = TRUE)- min(MinimumElectricityConsumptionkWh, na.rm = TRUE))%>%
+dplyr::ungroup()
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(StatisticsMinimumElectricityConsumption, width = Inf)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by write_csv():comma delimited csv file
+readr::write_csv(StatisticsMinimumElectricityConsumption, "WRStatisticsMinimumElectricityConsumptionComma.csv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by write_csv2():semicolon delimited csv file
+readr::write_csv2(StatisticsMinimumElectricityConsumption, "WRStatisticsMinimumElectricityConsumptionSemicolon.csv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by write_tsv():tab delimited file tsv file
+readr::write_tsv(StatisticsMinimumElectricityConsumption, "WRStatisticsMinimumElectricityConsumptionTab.tsv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by write_delim(): blank delimited txt file
+readr::write_delim(StatisticsMinimumElectricityConsumption, "WRStatisticsMinimumElectricityConsumptionBlankDelim.txt")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by vroom_write:comma delimited csv file
+vroom::vroom_write(StatisticsMinimumElectricityConsumption,"WRStatisticsMinimumElectricityConsumptionCommaCSVVroom.csv", delim = ",")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by vroom_write:semicolon delimited csv file
+vroom::vroom_write(StatisticsMinimumElectricityConsumption,"WRStatisticsMinimumElectricityConsumptionSemicolonCSVVroom.csv", delim = ";")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by vroom_write:tab delimited file tsv file
+vroom::vroom_write(StatisticsMinimumElectricityConsumption,"WRStatisticsMinimumElectricityConsumptionTabVroom.tsv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+# References, additional info, etc.
+# https://dplyr.tidyverse.org/reference/summarise.html
+# https://readr.tidyverse.org/reference/write_delim.html
+# https://www.tidyverse.org/blog/2019/05/vroom-1-0-0/#vroom-vs-readr
+# https://www.danielecook.com/speeding-up-reading-and-writing-in-r/ 
+# https://vroom.r-lib.org/index.html
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Maximum Electricity Consumption(kWh)summary descriptive statistics
+StatisticsMaximumElectricityConsumption <- GP2SWorld %>%
+dplyr::summarize(n = n(), MinMaximumElectricityConsumption = min(MaximumElectricityConsumptionkWh, na.rm = TRUE), FirstQuartileMaximumElectricityConsumption = quantile(MaximumElectricityConsumptionkWh, 0.25, na.rm = TRUE), MedianMaximumElectricityConsumption = median(MaximumElectricityConsumptionkWh, na.rm = TRUE), MeanMaximumElectricityConsumption = mean(MaximumElectricityConsumptionkWh, na.rm = TRUE), ThirdQuartileMaximumElectricityConsumption = quantile(MaximumElectricityConsumptionkWh, 0.75, na.rm = TRUE), MaxMaximumElectricityConsumption = max(MaximumElectricityConsumptionkWh, na.rm = TRUE), StdDevMaximumElectricityConsumption = sd(MaximumElectricityConsumptionkWh, na.rm = TRUE), IQRMaximumElectricityConsumption = IQR(MaximumElectricityConsumptionkWh, na.rm = TRUE), RangeMaximumElectricityConsumption = max(MaximumElectricityConsumptionkWh, na.rm = TRUE)- min(MaximumElectricityConsumptionkWh, na.rm = TRUE))%>%
+dplyr::ungroup()
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(StatisticsMaximumElectricityConsumption, width = Inf)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by write_csv():comma delimited csv file
+readr::write_csv(StatisticsMaximumElectricityConsumption, "WRStatisticsMaximumElectricityConsumptionComma.csv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by write_csv2():semicolon delimited csv file
+readr::write_csv2(StatisticsMaximumElectricityConsumption, "WRStatisticsMaximumElectricityConsumptionSemicolon.csv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by write_tsv():tab delimited file tsv file
+readr::write_tsv(StatisticsMaximumElectricityConsumption, "WRStatisticsMaximumElectricityConsumptionTab.tsv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by write_delim(): blank delimited txt file
+readr::write_delim(StatisticsMaximumElectricityConsumption, "WRStatisticsMaximumElectricityConsumptionBlankDelim.txt")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by vroom_write:comma delimited csv file
+vroom::vroom_write(StatisticsMaximumElectricityConsumption,"WRStatisticsMaximumElectricityConsumptionCommaCSVVroom.csv", delim = ",")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by vroom_write:semicolon delimited csv file
+vroom::vroom_write(StatisticsMaximumElectricityConsumption,"WRStatisticsMaximumElectricityConsumptionSemicolonCSVVroom.csv", delim = ";")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Write summary dataframe/tidyverse tibbles file by vroom_write:tab delimited file tsv file
+vroom::vroom_write(StatisticsMaximumElectricityConsumption,"WRStatisticsMaximumElectricityConsumptionTabVroom.tsv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+# References, additional info, etc.
+# https://dplyr.tidyverse.org/reference/summarise.html
+# https://readr.tidyverse.org/reference/write_delim.html
+# https://www.tidyverse.org/blog/2019/05/vroom-1-0-0/#vroom-vs-readr
+# https://www.danielecook.com/speeding-up-reading-and-writing-in-r/ 
+# https://vroom.r-lib.org/index.html
+
+
+
+# Code/script block 7
+# Ex-post (backward, historical) only data lineplots with ggMarginal
+# Plot lineplots with ggplot2 and ggMarginal, and save them in the folder 
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Gather each time series data for lineplots 
+WorldElectricityConsumption <- GP2SWorld %>%
+  tidyr::gather(key = "variable", value = "value", MinimumElectricityConsumptionkWh, MaximumElectricityConsumptionkWh, -Year)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(WorldElectricityConsumption)
+
+# Electricity Consumption(kWh)lineplot
+WorldElectricityConsumptionLinePlot <- ggplot2::ggplot(WorldElectricityConsumption, aes(x = Year, y = value, color = variable)) + 
+  geom_line(size = 1.2)+
+  geom_point(size=2.5)+
+  scale_color_discrete(name = "Electricity Consumption Datasets", labels = c("MinimumElectricityConsumptionkWh" = "Minimum Electricity Consumption Dataset (kWh)", "MaximumElectricityConsumptionkWh" = "Maximum Electricity Consumption Dataset (kWh)")) +
+  scale_x_continuous(name="Years")+
+  scale_y_continuous(name="Electricity Consumption (kWh)\n in billions (1000000000s) or in terawatt-hours (TWh)", labels=label_number(scale = 1/1000000000))+
+  labs(title="Electricity Consumption", caption = "Data: Global Power Prediction Systems Robot and Platform, World 1971-2018\n (as octonary or later level source, researcher’s own work generated based on datasources)")+
+  coord_cartesian(clip = "off")+
+  theme_bw(base_size = 12)+
+  theme(legend.position = "bottom",  legend.justification ="top", legend.direction = "vertical", legend.box="horizontal", legend.box.just="top")
+plot(WorldElectricityConsumptionLinePlot)
+WorldElectricityConsumptionLinePlotggMarginal <- ggExtra::ggMarginal(WorldElectricityConsumptionLinePlot, groupColour = TRUE, groupFill = TRUE, margins = "y", type="histogram")
+plot(WorldElectricityConsumptionLinePlotggMarginal)
+ggplot2::ggsave("WRWorldElectricityConsumptionLinePlotggMarginal.jpeg", plot= WorldElectricityConsumptionLinePlotggMarginal, width = 10, height = 6)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+# References, additional info, etc.
+# https://tidyr.tidyverse.org/reference/gather.html
+# https://rstudio-pubs-static.s3.amazonaws.com/282405_e280f5f0073544d7be417cde893d78d0.html
+# https://statisticsglobe.com/r-draw-multiple-lines-to-same-ggplot2-plot
+# https://www.r-graph-gallery.com/time-series.html
+# https://ggplot2.tidyverse.org/articles/articles/faq-customising.html
+# https://ggplot2.tidyverse.org/articles/articles/faq-axes.html
+# https://scales.r-lib.org/reference/label_number.html
+# https://ggplot2.tidyverse.org/reference/labs.html
+
+
+
+# Code/script block 8
+# Models (ex-post, backward, historical)
+# Splitting data for training set and test set (70/30 split of the data)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Set the pseudo random number stream using “set.seed()” to make the results reproducible 
+# https://www.tmwr.org/splitting.html
+# https://www.gmudatamining.com/lesson-10-r-tutorial.html
+# https://stats.stackexchange.com/questions/86285/random-number-set-seedn-in-r
+# https://jhudatascience.org/tidyversecourse/model.html#benefits-of-tidymodels
+set.seed(123456)
+# Training sets and test sets
+GP2SWorldSplit <- rsample::initial_time_split(GP2SWorld, prop = 0.70)
+GP2SWorldTrainData <- rsample::training(GP2SWorldSplit)
+GP2SWorldTestData <- rsample::testing(GP2SWorldSplit)
+# Convert tidyverse tibbles
+GP2SWorldTrainData <- tibble::as_tibble(GP2SWorldTrainData)
+GP2SWorldTestData <- tibble::as_tibble(GP2SWorldTestData)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(GP2SWorldTrainData)
+view(GP2SWorldTestData)
+
+# Minimum Electricity Consumption (kWh) model training set
+MinimumElectricityConsumptionTrainData <- GP2SWorldTrainData %>%
+dplyr::select(Year, MinimumElectricityConsumptionkWh)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(MinimumElectricityConsumptionTrainData)
+# Minimum Electricity Consumption (kWh) model test set
+MinimumElectricityConsumptionTestData <- GP2SWorldTestData %>%
+dplyr::select(Year, MinimumElectricityConsumptionkWh)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(MinimumElectricityConsumptionTestData)
+
+# Maximum Electricity Consumption (kWh) model training set
+MaximumElectricityConsumptionTrainData <- GP2SWorldTrainData %>%
+dplyr::select(Year, MaximumElectricityConsumptionkWh)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(MaximumElectricityConsumptionTrainData)
+# Maximum Electricity Consumption (kWh) model test set
+MaximumElectricityConsumptionTestData <- GP2SWorldTestData %>%
+dplyr::select(Year, MaximumElectricityConsumptionkWh)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(MaximumElectricityConsumptionTestData)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+# References, additional info, etc.
+# https://rsample.tidymodels.org/reference/initial_split.html#examples
+# https://www.tmwr.org/splitting.html
+# https://www.tidymodels.org/learn/models/time-series/
+# https://www.researchgate.net/post/Is-there-an-ideal-ratio-between-a-training-set-and-validation-set-Which-trade-off-would-you-suggest
+# https://www.gmudatamining.com/lesson-10-r-tutorial.html
+
+
+
+# Code/script block 9
+# Models (ex-post, backward, historical)
+# Running in training sets
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Minimum Electricity Consumption (kWh) “lm” model (ordinary least squares: OLS) with original year, R base, (Model 1)
+RegressionlmMinimum <- lm(MinimumElectricityConsumptionkWh ~ Year, data = MinimumElectricityConsumptionTrainData)
+# Coefficients of model *checkpoint*
+coef(RegressionlmMinimum)
+# Residuals of model *checkpoint*
+resid(RegressionlmMinimum)
+# Summary of model *checkpoint*
+summary(RegressionlmMinimum)
+# Summary of model *checkpoint*
+broom::tidy(RegressionlmMinimum)
+# Print model *checkpoint*
+print(RegressionlmMinimum)
+
+# Minimum Electricity Consumption (kWh) ”glm” (generalized linear models) model with original year, R base, (Model 2)
+RegressionglmMinimum <- glm(MinimumElectricityConsumptionkWh ~ Year, data = MinimumElectricityConsumptionTrainData)
+# Coefficients of model *checkpoint*
+coef(RegressionglmMinimum)
+# Residuals of model *checkpoint*
+resid(RegressionglmMinimum)
+# Summary of model *checkpoint*
+summary(RegressionglmMinimum)
+# Summary of model *checkpoint*
+broom::tidy(RegressionglmMinimum)
+# Print model *checkpoint*
+print(RegressionglmMinimum)
+
+# Minimum Electricity Consumption (kWh) “parsnip engine lm” machine learning with original year, R tidymodels, (Model 3)
+# “This engine has no tuning parameters” https://parsnip.tidymodels.org/reference/details_linear_reg_lm.html
+RegressionparsniplmMinimum <- parsnip::linear_reg() %>%
+parsnip::set_engine("lm") %>%
+parsnip::fit(MinimumElectricityConsumptionkWh ~ Year, data = MinimumElectricityConsumptionTrainData)
+RegressionparsniplmMinimum %>% 
+tune::extract_fit_engine() %>% 
+# Summary of model *checkpoint*
+summary()
+# Summary of model *checkpoint*
+broom::tidy(RegressionparsniplmMinimum)
+# Print model *checkpoint*
+print(RegressionparsniplmMinimum)
+
+# Minimum Electricity Consumption (kWh) “parsnip engine gmlnet” data transformation due to “x should be a matrix with 2 or more columns” error, in other words gmlnet runs with more than 1 predictor, R tidymodels, (Model 4-7)
+MinimumElectricityConsumptionTrainDatagmlnet <- dplyr::mutate(MinimumElectricityConsumptionTrainData, YearAdjusted = Year - min(Year))
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(MinimumElectricityConsumptionTrainDatagmlnet)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(MinimumElectricityConsumptionTrainDatagmlnet)
+
+# Minimum Electricity Consumption (kWh) “parsnip engine gmlnet” machine learning with original year and dummy normalized year with minimum year (0, 1, 2, 3, …), penalty 0.001 and lasso regularization regression model, R tidymodels, (Model 4)
+Regressionparsnipglmnet001lassoMinimum <- parsnip::linear_reg(penalty = 0.001, mixture = 1) %>%
+parsnip::set_engine("glmnet") %>%
+parsnip::fit(MinimumElectricityConsumptionkWh ~ . , data = MinimumElectricityConsumptionTrainDatagmlnet)
+Regressionparsnipglmnet001lassoMinimum %>%
+tune::extract_fit_engine() %>% 
+# Summary of model *checkpoint*
+summary()
+# Summary of model *checkpoint*
+broom::tidy(Regressionparsnipglmnet001lassoMinimum)
+# Print model *checkpoint*
+print(Regressionparsnipglmnet001lassoMinimum)
+
+# Minimum Electricity Consumption (kWh) “parsnip engine gmlnet” machine learning with original year and dummy normalized year with minimum year (0, 1, 2, 3, …), penalty 0.001 and ridge regularization regression model, R tidymodels, (Model 5)
+Regressionparsnipglmnet001ridgeMinimum <- parsnip::linear_reg(penalty = 0.001, mixture = 0) %>%
+parsnip::set_engine("glmnet") %>%
+parsnip::fit(MinimumElectricityConsumptionkWh ~ . , data = MinimumElectricityConsumptionTrainDatagmlnet)
+Regressionparsnipglmnet001ridgeMinimum %>%
+tune::extract_fit_engine() %>% 
+# Summary of model *checkpoint*
+summary()
+# Summary of model *checkpoint*
+broom::tidy(Regressionparsnipglmnet001ridgeMinimum)
+# Print model *checkpoint*
+print(Regressionparsnipglmnet001ridgeMinimum)
+
+# Minimum Electricity Consumption (kWh) “parsnip engine gmlnet” machine learning with original year and dummy normalized year with minimum year (0, 1, 2, 3, …), penalty 1 and lasso regularization regression model, R tidymodels, (Model 6)
+Regressionparsnipglmnet1lassoMinimum <- parsnip::linear_reg(penalty = 1, mixture = 1) %>%
+parsnip::set_engine("glmnet") %>%
+parsnip::fit(MinimumElectricityConsumptionkWh ~ . , data = MinimumElectricityConsumptionTrainDatagmlnet)
+Regressionparsnipglmnet1lassoMinimum %>%
+tune::extract_fit_engine() %>% 
+# Summary of model *checkpoint*
+summary()
+# Summary of model *checkpoint*
+broom::tidy(Regressionparsnipglmnet1lassoMinimum)
+# Print model *checkpoint*
+print(Regressionparsnipglmnet1lassoMinimum)
+
+# Minimum Electricity Consumption (kWh) “parsnip engine gmlnet” machine learning with original year and dummy normalized year with minimum year (0, 1, 2, 3, …), penalty 1 and ridge regularization regression model, R tidymodels, (Model 7)
+Regressionparsnipglmnet1ridgeMinimum <- parsnip::linear_reg(penalty = 1, mixture = 0) %>%
+parsnip::set_engine("glmnet") %>%
+parsnip::fit(MinimumElectricityConsumptionkWh ~ . , data = MinimumElectricityConsumptionTrainDatagmlnet)
+Regressionparsnipglmnet1ridgeMinimum %>%
+tune::extract_fit_engine() %>% 
+# Summary of model *checkpoint*
+summary()
+# Summary of model *checkpoint*
+broom::tidy(Regressionparsnipglmnet1ridgeMinimum)
+# Print model *checkpoint*
+print(Regressionparsnipglmnet1ridgeMinimum)
+
+# Minimum Electricity Consumption (kWh) “forecast” data transformation due to “y should be a univariate time series” error, R forecast, (Model 8-10)
+MinimumElectricityConsumptionkWhTrain <- MinimumElectricityConsumptionTrainData %>% dplyr::select(MinimumElectricityConsumptionkWh)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(MinimumElectricityConsumptionkWhTrain)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(MinimumElectricityConsumptionkWhTrain)
+
+# Minimum Electricity Consumption (kWh) Auto (automatic) ARIMA (Autoregressive Integrated Moving Average) model, R forecast, (Model 8)
+AutoARIMAMinimum <- auto.arima(MinimumElectricityConsumptionkWhTrain, seasonal=FALSE, lambda = "auto")
+# Summary of model *checkpoint*
+summary(AutoARIMAMinimum)
+# Print model *checkpoint*
+print(AutoARIMAMinimum)
+# Plot characteristic roots *checkpoint*
+autoplot(AutoARIMAMinimum)
+# Autoplot model forecast *checkpoint*
+autoplot(forecast(AutoARIMAMinimum))
+
+
+# Minimum Electricity Consumption (kWh) ARIMA (Autoregressive Integrated Moving Average), ARIMA(p,d,q): ARIMA(1,1,2) model, R forecast, (Model 9)
+ARIMA112Minimum <- arima(MinimumElectricityConsumptionkWhTrain, order = c(1, 1, 2))
+# Summary of model *checkpoint*
+summary(ARIMA112Minimum)
+# Print model *checkpoint*
+print(ARIMA112Minimum)
+# Plot characteristic roots *checkpoint*
+autoplot(ARIMA112Minimum)
+# Autoplot model forecast *checkpoint*
+autoplot(forecast(ARIMA112Minimum))
+ 
+
+# Minimum Electricity Consumption (kWh) ARIMA (Autoregressive Integrated Moving Average), ARIMA(p,d,q):ARIMA(1,1,8) model, R forecast, (Model 10)
+ARIMA1110Minimum <- arima(MinimumElectricityConsumptionkWhTrain, order = c(1, 1, 8))
+# Summary of model *checkpoint*
+summary(ARIMA1110Minimum)
+# Print model *checkpoint*
+print(ARIMA1110Minimum)
+# Plot characteristic roots *checkpoint*
+autoplot(ARIMA1110Minimum)
+# Autoplot model forecast *checkpoint*
+autoplot(forecast(ARIMA1110Minimum))
+
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+# tidy() “Warning messages: 1: Data frame tidiers are deprecated and will be removed in an upcoming release of broom. 2: `data_frame()` was deprecated in tibble 1.1.0. Please use `tibble()` instead.”
+# This warning message can be eliminated with a small script to drop NA values. This warning message has not any effect in further script steps.
+# “Loading required package: Matrix Attaching package: ‘Matrix’ The following objects are masked from ‘package:tidyr’:expand, pack, unpack Loaded glmnet 4.1-2”
+
+
+# Start system time for runtime analysis
+timestart <- Sys.time()
+
+# Maximum Electricity Consumption (kWh) “lm” model (ordinary least squares: OLS) with original year, R base, (Model 1)
+RegressionlmMaximum <- lm(MaximumElectricityConsumptionkWh ~ Year, data = MaximumElectricityConsumptionTrainData)
+# Coefficients of model *checkpoint*
+coef(RegressionlmMaximum)
+# Residuals of model *checkpoint*
+resid(RegressionlmMaximum)
+# Summary of model *checkpoint*
+summary(RegressionlmMaximum)
+# Summary of model *checkpoint*
+broom::tidy(RegressionlmMaximum)
+# Print model *checkpoint*
+print(RegressionlmMaximum)
+
+# Maximum Electricity Consumption (kWh) ”glm” (generalized linear models) model with original year, R base, (Model 2)
+RegressionglmMaximum <- glm(MaximumElectricityConsumptionkWh ~ Year, data = MaximumElectricityConsumptionTrainData)
+# Coefficients of model *checkpoint*
+coef(RegressionglmMaximum)
+# Residuals of model *checkpoint*
+resid(RegressionglmMaximum)
+# Summary of model *checkpoint*
+summary(RegressionglmMaximum)
+# Summary of model *checkpoint*
+broom::tidy(RegressionglmMaximum)
+# Print model *checkpoint*
+print(RegressionglmMaximum)
+
+# Maximum Electricity Consumption (kWh) “parsnip engine lm” machine learning with original year, R tidymodels, (Model 3)
+# “This engine has no tuning parameters” https://parsnip.tidymodels.org/reference/details_linear_reg_lm.html
+RegressionparsniplmMaximum <- parsnip::linear_reg() %>%
+parsnip::set_engine("lm") %>%
+parsnip::fit(MaximumElectricityConsumptionkWh ~ Year, data = MaximumElectricityConsumptionTrainData)
+RegressionparsniplmMaximum %>% 
+tune::extract_fit_engine() %>% 
+# Summary of model *checkpoint*
+summary()
+# Summary of model *checkpoint*
+broom::tidy(RegressionparsniplmMaximum)
+# Print model *checkpoint*
+print(RegressionparsniplmMaximum)
+
+# Maximum Electricity Consumption (kWh) “parsnip engine gmlnet” data transformation due to “x should be a matrix with 2 or more columns” error, in other words gmlnet runs with more than 1 predictor, R tidymodels, (Model 4-7)
+MaximumElectricityConsumptionTrainDatagmlnet <- dplyr::mutate(MaximumElectricityConsumptionTrainData, YearAdjusted = Year - min(Year))
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(MaximumElectricityConsumptionTrainDatagmlnet)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(MaximumElectricityConsumptionTrainDatagmlnet)
+
+# Maximum Electricity Consumption (kWh) “parsnip engine gmlnet” machine learning with original year and dummy normalized year with minimum year (0, 1, 2, 3, …), penalty 0.001 and lasso regularization regression model, R tidymodels, (Model 4)
+Regressionparsnipglmnet001lassoMaximum <- parsnip::linear_reg(penalty = 0.001, mixture = 1) %>%
+parsnip::set_engine("glmnet") %>%
+parsnip::fit(MaximumElectricityConsumptionkWh ~ . , data = MaximumElectricityConsumptionTrainDatagmlnet)
+Regressionparsnipglmnet001lassoMaximum %>%
+tune::extract_fit_engine() %>% 
+# Summary of model *checkpoint*
+summary()
+# Summary of model *checkpoint*
+broom::tidy(Regressionparsnipglmnet001lassoMaximum)
+# Print model *checkpoint*
+print(Regressionparsnipglmnet001lassoMaximum)
+
+# Maximum Electricity Consumption (kWh) “parsnip engine gmlnet” machine learning with original year and dummy normalized year with minimum year (0, 1, 2, 3, …), penalty 0.001 and ridge regularization regression model, R tidymodels, (Model 5)
+Regressionparsnipglmnet001ridgeMaximum <- parsnip::linear_reg(penalty = 0.001, mixture = 0) %>%
+parsnip::set_engine("glmnet") %>%
+parsnip::fit(MaximumElectricityConsumptionkWh ~ . , data = MaximumElectricityConsumptionTrainDatagmlnet)
+Regressionparsnipglmnet001ridgeMaximum %>%
+tune::extract_fit_engine() %>% 
+# Summary of model *checkpoint*
+summary()
+# Summary of model *checkpoint*
+broom::tidy(Regressionparsnipglmnet001ridgeMaximum)
+# Print model *checkpoint*
+print(Regressionparsnipglmnet001ridgeMaximum)
+
+# Maximum Electricity Consumption (kWh) “parsnip engine gmlnet” machine learning with original year and dummy normalized year with minimum year (0, 1, 2, 3, …), penalty 1 and lasso regularization regression model, R tidymodels, (Model 6)
+Regressionparsnipglmnet1lassoMaximum <- parsnip::linear_reg(penalty = 1, mixture = 1) %>%
+parsnip::set_engine("glmnet") %>%
+parsnip::fit(MaximumElectricityConsumptionkWh ~ . , data = MaximumElectricityConsumptionTrainDatagmlnet)
+Regressionparsnipglmnet1lassoMaximum %>%
+tune::extract_fit_engine() %>% 
+# Summary of model *checkpoint*
+summary()
+# Summary of model *checkpoint*
+broom::tidy(Regressionparsnipglmnet1lassoMaximum)
+# Print model *checkpoint*
+print(Regressionparsnipglmnet1lassoMaximum)
+
+# Maximum Electricity Consumption (kWh) “parsnip engine gmlnet” machine learning with original year and dummy normalized year with minimum year (0, 1, 2, 3, …), penalty 1 and ridge regularization regression model, R tidymodels, (Model 7)
+Regressionparsnipglmnet1ridgeMaximum <- parsnip::linear_reg(penalty = 1, mixture = 0) %>%
+parsnip::set_engine("glmnet") %>%
+parsnip::fit(MaximumElectricityConsumptionkWh ~ . , data = MaximumElectricityConsumptionTrainDatagmlnet)
+Regressionparsnipglmnet1ridgeMaximum %>%
+tune::extract_fit_engine() %>% 
+# Summary of model *checkpoint*
+summary()
+# Summary of model *checkpoint*
+broom::tidy(Regressionparsnipglmnet1ridgeMaximum)
+# Print model *checkpoint*
+print(Regressionparsnipglmnet1ridgeMaximum)
+
+# Maximum Electricity Consumption (kWh) “forecast” data transformation due to “y should be a univariate time series” error, R forecast, (Model 8-10)
+MaximumElectricityConsumptionkWhTrain <- MaximumElectricityConsumptionTrainData %>% dplyr::select(MaximumElectricityConsumptionkWh)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(MaximumElectricityConsumptionkWhTrain)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(MaximumElectricityConsumptionkWhTrain)
+
+# Maximum Electricity Consumption (kWh) Auto (automatic) ARIMA (Autoregressive Integrated Moving Average) model, R forecast, (Model 8)
+AutoARIMAMaximum <- forecast::auto.arima(MaximumElectricityConsumptionkWhTrain, seasonal=FALSE, lambda = "auto")
+# Summary of model *checkpoint*
+summary(AutoARIMAMaximum)
+# Print model *checkpoint*
+print(AutoARIMAMaximum)
+# Plot characteristic roots *checkpoint*
+autoplot(AutoARIMAMaximum)
+# Autoplot model forecast *checkpoint*
+autoplot(forecast(AutoARIMAMaximum))
+
+
+# Maximum Electricity Consumption (kWh) ARIMA (Autoregressive Integrated Moving Average), ARIMA(p,d,q): ARIMA(1,1,2) model, R forecast, (Model 9)
+ARIMA112Maximum <- arima(MaximumElectricityConsumptionkWhTrain, order = c(1, 1, 2))
+# Summary of model *checkpoint*
+summary(ARIMA112Maximum)
+# Print model *checkpoint*
+print(ARIMA112Maximum)
+# Plot characteristic roots *checkpoint*
+autoplot(ARIMA112Maximum)
+# Autoplot model forecast *checkpoint*
+autoplot(forecast(ARIMA112Maximum))
+
+
+# Maximum Electricity Consumption (kWh) ARIMA (Autoregressive Integrated Moving Average), ARIMA(p,d,q): ARIMA(1,1,8) model, R forecast, (Model 10)
+ARIMA1110Maximum <- arima(MaximumElectricityConsumptionkWhTrain, order = c(1, 1, 8))
+# Summary of model *checkpoint*
+summary(ARIMA1110Maximum)
+# Print model *checkpoint*
+print(ARIMA1110Maximum)
+# Plot characteristic roots *checkpoint*
+autoplot(ARIMA1110Maximum)
+# Autoplot model forecast *checkpoint*
+autoplot(forecast(ARIMA1110Maximum))
+
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+# References, additional info, etc.
+# https://cloud.r-project.org/web/packages/parsnip/index.html
+# https://github.com/tidymodels/parsnip
+# https://www.tmwr.org/models.html
+# https://parsnip.tidymodels.org/reference/linear_reg.html
+# https://search.r-project.org/R/refmans/stats/html/lm.html
+# https://search.r-project.org/R/refmans/stats/html/glm.html
+# https://search.r-project.org/CRAN/refmans/glmnet/html/glmnet.html
+# https://parsnip.tidymodels.org/reference/details_linear_reg_lm.html
+# https://parsnip.tidymodels.org/reference/glmnet-details.html
+# https://parsnip.tidymodels.org/articles/articles/Examples.html
+# https://parsnip.tidymodels.org/reference/details_linear_reg_glmnet.html
+# https://glmnet.stanford.edu/index.html
+# https://otexts.com/fpp2/non-seasonal-arima.html
+# https://rpubs.com/riazakhan94/arima_with_example
+# https://stackoverflow.com/questions/67158692/why-forecastmodel-h-2-function-returns-na-value-model-is-from-r-auto-arima
+
+
+
+# Code/script block 10
+# Prediction of models (ex-post, backward, historical)
+# Running in test sets
+
+# Start system time for runtime analysis
+timestart <- Sys.time()
+
+# Minimum Electricity Consumption (kWh) models predictions in test sets
+# Minimum Model 1 RegressionlmMinimum
+PredictionRegressionlmMinimum <- RegressionlmMinimum %>%
+stats::predict(MinimumElectricityConsumptionTestData)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionlmMinimum)
+
+# Minimum Model 2 RegressionglmMinimum
+PredictionRegressionglmMinimum <- RegressionglmMinimum %>%
+stats::predict(MinimumElectricityConsumptionTestData)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionglmMinimum)
+
+# Minimum Model 3 RegressionparsniplmMinimum
+PredictionRegressionparsniplmMinimum <- RegressionparsniplmMinimum %>%
+stats::predict(MinimumElectricityConsumptionTestData)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionparsniplmMinimum)
+
+# Minimum Electricity Consumption (kWh) “parsnip engine gmlnet” data transformation due to “x should be a matrix with 2 or more columns” error, in other words gmlnet runs with more than 1 predictor, (Model 4-7)
+MinimumElectricityConsumptionTestDatagmlnet <- dplyr::mutate(MinimumElectricityConsumptionTestData, YearAdjusted = Year - min(Year))
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(MinimumElectricityConsumptionTestDatagmlnet)
+
+# Minimum Model 4 Regressionparsnipglmnet001lassoMinimum
+PredictionRegressionparsnipglmnet001lassoMinimum <- Regressionparsnipglmnet001lassoMinimum %>%
+stats::predict(MinimumElectricityConsumptionTestDatagmlnet)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionparsnipglmnet001lassoMinimum)
+
+# Minimum Model 5 Regressionparsnipglmnet001ridgeMinimum
+PredictionRegressionparsnipglmnet001ridgeMinimum <- Regressionparsnipglmnet001ridgeMinimum %>%
+stats::predict(MinimumElectricityConsumptionTestDatagmlnet)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionparsnipglmnet001ridgeMinimum)
+
+# Minimum Model 6 Regressionparsnipglmnet1lassoMinimum
+PredictionRegressionparsnipglmnet1lassoMinimum <- Regressionparsnipglmnet1lassoMinimum %>%
+stats::predict(MinimumElectricityConsumptionTestDatagmlnet)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionparsnipglmnet1lassoMinimum)
+
+# Minimum Model 7 Regressionparsnipglmnet1ridgeMinimum
+PredictionRegressionparsnipglmnet1ridgeMinimum <- Regressionparsnipglmnet1ridgeMinimum %>%
+stats::predict(MinimumElectricityConsumptionTestDatagmlnet)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionparsnipglmnet1ridgeMinimum)
+
+# Minimum Electricity Consumption (kWh) “forecast” data period count, (Model 8-10)
+TestPeriod <- count(MinimumElectricityConsumptionTestData)
+TestPeriod <- as.numeric(TestPeriod)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(TestPeriod)
+
+# Minimum Model 8 AutoARIMAMinimum
+PredictionAutoARIMAMinimum <- forecast(AutoARIMAMinimum, h= TestPeriod)
+PredictionAutoARIMAMinimum <- as.numeric(PredictionAutoARIMAMinimum$mean)
+PredictionAutoARIMAMinimum <- tibble::as.tibble(PredictionAutoARIMAMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionAutoARIMAMinimum)
+
+# Minimum Model 9 ARIMA112Minimum
+PredictionARIMA112Minimum <- forecast(ARIMA112Minimum, h= TestPeriod)
+PredictionARIMA112Minimum <- as.numeric(PredictionARIMA112Minimum$mean)
+PredictionARIMA112Minimum <- tibble::as.tibble(PredictionARIMA112Minimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionARIMA112Minimum)
+
+# Minimum Model 10 ARIMA1110Minimum
+PredictionARIMA1110Minimum <- forecast(ARIMA1110Minimum, h= TestPeriod)
+PredictionARIMA1110Minimum <- as.numeric(PredictionARIMA1110Minimum$mean)
+PredictionARIMA1110Minimum <- tibble::as.tibble(PredictionARIMA1110Minimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionARIMA1110Minimum)
+
+# Stop system time for runtime analysis
+timestop <- Sys.time()
+# Runtime analysis
+executiontime <- timestop-timestart
+# Print runtime
+print(executiontime)
+
+# Start system time for runtime analysis
+timestart <- Sys.time()
+
+# Maximum Electricity Consumption (kWh) models predictions in test sets
+# Maximum Model 1 RegressionlmMaximum
+PredictionRegressionlmMaximum <- RegressionlmMaximum %>%
+stats::predict(MaximumElectricityConsumptionTestData)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionlmMaximum)
+
+# Maximum Model 2 RegressionglmMaximum
+PredictionRegressionglmMaximum <- RegressionglmMaximum %>%
+stats::predict(MaximumElectricityConsumptionTestData)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionglmMaximum)
+
+# Maximum Model 3 RegressionparsniplmMaximum
+PredictionRegressionparsniplmMaximum <- RegressionparsniplmMaximum %>%
+stats::predict(MaximumElectricityConsumptionTestData)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionparsniplmMaximum)
+
+# Maximum Electricity Consumption (kWh) “parsnip engine gmlnet” data transformation due to “x should be a matrix with 2 or more columns” error, in other words gmlnet runs with more than 1 predictor, (Model 4-7)
+MaximumElectricityConsumptionTestDatagmlnet <- mutate(MaximumElectricityConsumptionTestData, YearAdjusted = Year - min(Year))
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(MaximumElectricityConsumptionTestDatagmlnet)
+
+# Maximum Model 4 Regressionparsnipglmnet001lassoMaximum
+PredictionRegressionparsnipglmnet001lassoMaximum <- Regressionparsnipglmnet001lassoMaximum %>%
+stats::predict(MaximumElectricityConsumptionTestDatagmlnet)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionparsnipglmnet001lassoMaximum)
+
+# Maximum Model 5 Regressionparsnipglmnet001ridgeMaximum
+PredictionRegressionparsnipglmnet001ridgeMaximum <- Regressionparsnipglmnet001ridgeMaximum %>%
+stats::predict(MaximumElectricityConsumptionTestDatagmlnet)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionparsnipglmnet001ridgeMaximum)
+
+# Maximum Model 6 Regressionparsnipglmnet1lassoMaximum
+PredictionRegressionparsnipglmnet1lassoMaximum <- Regressionparsnipglmnet1lassoMaximum %>%
+stats::predict(MaximumElectricityConsumptionTestDatagmlnet)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionparsnipglmnet1lassoMaximum)
+
+# Maximum Model 7 Regressionparsnipglmnet1ridgeMaximum
+PredictionRegressionparsnipglmnet1ridgeMaximum <- Regressionparsnipglmnet1ridgeMaximum %>%
+stats::predict(MaximumElectricityConsumptionTestDatagmlnet)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionRegressionparsnipglmnet1ridgeMaximum)
+
+# Maximum Electricity Consumption (kWh) “forecast” data period count, (Model 8-10)
+TestPeriod <- count(MaximumElectricityConsumptionTestData)
+TestPeriod <- as.numeric(TestPeriod)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(TestPeriod)
+
+# Maximum Model 8 AutoARIMAMaximum
+PredictionAutoARIMAMaximum <- forecast(AutoARIMAMaximum, h= TestPeriod)
+PredictionAutoARIMAMaximum <- as.numeric(PredictionAutoARIMAMaximum$mean)
+PredictionAutoARIMAMaximum <- tibble::as.tibble(PredictionAutoARIMAMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionAutoARIMAMaximum)
+
+# Maximum Model 9 ARIMA112Maximum
+PredictionARIMA112Maximum <- forecast(ARIMA112Maximum, h= TestPeriod)
+PredictionARIMA112Maximum <- as.numeric(PredictionARIMA112Maximum$mean)
+PredictionARIMA112Maximum <- tibble::as.tibble(PredictionARIMA112Maximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionARIMA112Maximum)
+
+# Maximum Model 10 ARIMA1110Maximum
+PredictionARIMA1110Maximum <- forecast(ARIMA1110Maximum, h= TestPeriod)
+PredictionARIMA1110Maximum <- as.numeric(PredictionARIMA1110Maximum$mean)
+PredictionARIMA1110Maximum <- tibble::as.tibble(PredictionARIMA1110Maximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionARIMA1110Maximum)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+# References, additional info, etc.
+# https://parsnip.tidymodels.org/reference/predict.model_fit.html
+# https://dplyr.tidyverse.org/reference/count.html
+
+
+
+# Code/script block 11
+# Performance comparison of models
+# Start system time for runtime analysis
+timestart <- Sys.time()
+
+# Combine minimum predictions as dataframe/tidyverse tibbles
+PredictionDataTestSetsMinimum <- bind_cols(PredictionRegressionlmMinimum, PredictionRegressionglmMinimum, PredictionRegressionparsniplmMinimum, PredictionRegressionparsnipglmnet001lassoMinimum, PredictionRegressionparsnipglmnet001ridgeMinimum, PredictionRegressionparsnipglmnet1lassoMinimum, PredictionRegressionparsnipglmnet1ridgeMinimum, PredictionAutoARIMAMinimum, PredictionARIMA112Minimum, PredictionARIMA1110Minimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionDataTestSetsMinimum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(PredictionDataTestSetsMinimum)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (PredictionDataTestSetsMinimum) <- c("PredictionRegressionlmMinimum","PredictionRegressionglmMinimum","PredictionRegressionparsniplmMinimum","PredictionRegressionparsnipglmnet001lassoMinimum","PredictionRegressionparsnipglmnet001ridgeMinimum","PredictionRegressionparsnipglmnet1lassoMinimum","PredictionRegressionparsnipglmnet1ridgeMinimum","PredictionAutoARIMAMinimum","PredictionARIMA112Minimum","PredictionARIMA1110Minimum")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionDataTestSetsMinimum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(PredictionDataTestSetsMinimum)
+
+# Combine minimum actuals and minimum predictions as dataframe/tidyverse tibbles
+PredictionAllDataTestSetsMinimum <- bind_cols(MinimumElectricityConsumptionTestData, PredictionDataTestSetsMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionAllDataTestSetsMinimum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(PredictionAllDataTestSetsMinimum)
+
+# Write prediction in all test set dataframe/tidyverse tibbles file by write_delim(): blank delimited txt file
+readr::write_delim(PredictionAllDataTestSetsMinimum, "WRPredictionAllDataTestSetsMinimum.txt")
+# Write prediction in all test set dataframe/tidyverse tibbles file by write_csv():comma delimited csv file
+readr::write_csv(PredictionAllDataTestSetsMinimum, "WRPredictionAllDataTestSetsMinimum.csv")
+
+# Convert prediction in all test set dataframe/tidyverse tibbles
+PredictionAllDataTestSetsMinimumtibble <- tibble::as_tibble(PredictionAllDataTestSetsMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionAllDataTestSetsMinimumtibble)
+
+# Write prediction in all test set dataframe/tidyverse tibbles file by write_delim(): blank delimited txt file
+readr::write_delim(PredictionAllDataTestSetsMinimumtibble, "WRPredictionAllDataTestSetsMinimumtibble.txt")
+# Write prediction in all test set dataframe/tidyverse tibbles file by write_csv():comma delimited csv file
+readr::write_csv(PredictionAllDataTestSetsMinimumtibble, "WRPredictionAllDataTestSetsMinimumtibble.csv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+
+# Start system time for runtime analysis
+timestart <- Sys.time()
+
+# Combine maximum predictions as dataframe/tidyverse tibbles
+PredictionDataTestSetsMaximum <- bind_cols(PredictionRegressionlmMaximum, PredictionRegressionglmMaximum, PredictionRegressionparsniplmMaximum, PredictionRegressionparsnipglmnet001lassoMaximum, PredictionRegressionparsnipglmnet001ridgeMaximum, PredictionRegressionparsnipglmnet1lassoMaximum, PredictionRegressionparsnipglmnet1ridgeMaximum, PredictionAutoARIMAMaximum, PredictionARIMA112Maximum, PredictionARIMA1110Maximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionDataTestSetsMaximum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(PredictionDataTestSetsMaximum)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (PredictionDataTestSetsMaximum) <- c("PredictionRegressionlmMaximum","PredictionRegressionglmMaximum","PredictionRegressionparsniplmMaximum","PredictionRegressionparsnipglmnet001lassoMaximum","PredictionRegressionparsnipglmnet001ridgeMaximum","PredictionRegressionparsnipglmnet1lassoMaximum","PredictionRegressionparsnipglmnet1ridgeMaximum","PredictionAutoARIMAMaximum","PredictionARIMA112Maximum","PredictionARIMA1110Maximum")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionDataTestSetsMaximum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(PredictionDataTestSetsMaximum)
+
+# Combine maximum actuals and maximum predictions as dataframe/tidyverse tibbles
+PredictionAllDataTestSetsMaximum <- bind_cols(MaximumElectricityConsumptionTestData, PredictionDataTestSetsMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionAllDataTestSetsMaximum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(PredictionAllDataTestSetsMaximum)
+
+# Write prediction in all test set dataframe/tidyverse tibbles file by write_delim(): blank delimited txt file
+readr::write_delim(PredictionAllDataTestSetsMaximum, "WRPredictionAllDataTestSetsMaximum.txt")
+# Write prediction in all test set dataframe/tidyverse tibbles file by write_csv():comma delimited csv file
+readr::write_csv(PredictionAllDataTestSetsMaximum, "WRPredictionAllDataTestSetsMaximum.csv")
+
+# Convert prediction in all test set dataframe/tidyverse tibbles
+PredictionAllDataTestSetsMaximumtibble <- tibble::as_tibble(PredictionAllDataTestSetsMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionAllDataTestSetsMaximumtibble)
+
+# Write prediction in all test set dataframe/tidyverse tibbles file by write_delim(): blank delimited txt file
+readr::write_delim(PredictionAllDataTestSetsMaximumtibble, "WRPredictionAllDataTestSetsMaximumtibble.txt")
+# Write prediction in all test set dataframe/tidyverse tibbles file by write_csv():comma delimited csv file
+readr::write_csv(PredictionAllDataTestSetsMaximumtibble, "WRPredictionAllDataTestSetsMaximumtibble.csv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+
+
+
+# Code/script block 12
+# Performance comparison of models
+# Running in test sets
+# Metrics set
+GP2Smetrics <- metric_set(rmse, rsq, rsq_trad, msd, mae, mpe, mape, smape, mase, ccc)
+GP2Smetrics
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Performance comparison of models
+# Minimum Model 1 RegressionlmMinimum
+PerformancelmMinimum <- GP2Smetrics(PredictionAllDataTestSetsMinimum, truth = MinimumElectricityConsumptionkWh, estimate = PredictionRegressionlmMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformancelmMinimum)
+
+# Minimum Model 2 RegressionglmMinimum
+PerformanceglmMinimum <- GP2Smetrics(PredictionAllDataTestSetsMinimum, truth = MinimumElectricityConsumptionkWh, estimate = PredictionRegressionglmMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceglmMinimum)
+
+# Minimum Model 3 RegressionparsniplmMinimum
+PerformanceparsniplmMinimum <- GP2Smetrics(PredictionAllDataTestSetsMinimum, truth = MinimumElectricityConsumptionkWh, estimate = PredictionRegressionparsniplmMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceparsniplmMinimum)
+
+# Minimum Model 4 Regressionparsnipglmnet001lassoMinimum
+PerformanceRegressionparsnipglmnet001lassoMinimum <- GP2Smetrics(PredictionAllDataTestSetsMinimum, truth = MinimumElectricityConsumptionkWh, estimate = PredictionRegressionparsnipglmnet001lassoMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceRegressionparsnipglmnet001lassoMinimum)
+
+# Minimum Model 5 Regressionparsnipglmnet001ridgeMinimum
+PerformanceRegressionparsnipglmnet001ridgeMinimum <- GP2Smetrics(PredictionAllDataTestSetsMinimum, truth = MinimumElectricityConsumptionkWh, estimate = PredictionRegressionparsnipglmnet001ridgeMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceRegressionparsnipglmnet001ridgeMinimum)
+
+# Minimum Model 6 Regressionparsnipglmnet1lassoMinimum
+PerformanceRegressionparsnipglmnet1lassoMinimum <- GP2Smetrics(PredictionAllDataTestSetsMinimum, truth = MinimumElectricityConsumptionkWh, estimate = PredictionRegressionparsnipglmnet1lassoMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceRegressionparsnipglmnet1lassoMinimum)
+
+# Minimum Model 7 Regressionparsnipglmnet1ridgeMinimum
+PerformanceRegressionparsnipglmnet1ridgeMinimum <- GP2Smetrics(PredictionAllDataTestSetsMinimum, truth = MinimumElectricityConsumptionkWh, estimate = PredictionRegressionparsnipglmnet1ridgeMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceRegressionparsnipglmnet1ridgeMinimum)
+
+# Minimum Model 8 AutoARIMAMinimum
+PerformanceAutoARIMAMinimum <- GP2Smetrics(PredictionAllDataTestSetsMinimum, truth = MinimumElectricityConsumptionkWh, estimate = PredictionAutoARIMAMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceAutoARIMAMinimum)
+
+# Minimum Model 9 ARIMA112Minimum
+PerformanceARIMA112Minimum <- GP2Smetrics(PredictionAllDataTestSetsMinimum, truth = MinimumElectricityConsumptionkWh, estimate = PredictionARIMA112Minimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceARIMA112Minimum)
+
+# Minimum Model 10 ARIMA1110Minimum
+PerformanceARIMA1110Minimum <- GP2Smetrics(PredictionAllDataTestSetsMinimum, truth = MinimumElectricityConsumptionkWh, estimate = PredictionARIMA1110Minimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceARIMA1110Minimum)
+
+# Combine performance minimum as dataframe/tidyverse tibbles
+PerformanceModelsMinimum <- bind_cols(PerformancelmMinimum, PerformanceglmMinimum$.estimate, PerformanceparsniplmMinimum$.estimate, PerformanceRegressionparsnipglmnet001lassoMinimum$.estimate, PerformanceRegressionparsnipglmnet001ridgeMinimum$.estimate, PerformanceRegressionparsnipglmnet1lassoMinimum$.estimate,
+PerformanceRegressionparsnipglmnet1ridgeMinimum$.estimate, PerformanceAutoARIMAMinimum$.estimate, PerformanceARIMA112Minimum$.estimate, PerformanceARIMA1110Minimum$.estimate)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceModelsMinimum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(PerformanceModelsMinimum)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (PerformanceModelsMinimum) <- c("Metric","Estimator","PerformancelmMinimum","PerformanceglmMinimum","PerformanceparsniplmMinimum","Performanceparsnipglmnet001lassoMinimum","Performanceparsnipglmnet001ridgeMinimum","Performanceparsnipglmnet1lassoMinimum","Performanceparsnipglmnet1ridgeMinimum","PerformanceAutoARIMAMinimum","PerformanceARIMA112Minimum","PerformanceARIMA1110Minimum")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceModelsMinimum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(PerformanceModelsMinimum)
+
+# Write summary dataframe/tidyverse tibbles file by write_csv():comma delimited csv file
+readr::write_csv(PerformanceModelsMinimum, "WRPerformanceModelsMinimum.csv")
+
+# Convert prediction in all test set dataframe/tidyverse tibbles
+PerformanceModelsMinimumtibble <- tibble::as_tibble(PerformanceModelsMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceModelsMinimumtibble)
+
+# Write prediction in all test set dataframe/tidyverse tibbles file by write_delim(): blank delimited txt file
+readr::write_delim(PerformanceModelsMinimumtibble, "WRPerformanceModelsMinimumtibble.txt")
+# Write prediction in all test set dataframe/tidyverse tibbles file by write_csv():comma delimited csv file
+readr::write_csv(PerformanceModelsMinimumtibble, "WRPerformanceModelsMinimumtibble.csv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+# AutoARIMAMinimum “Warning message: A correlation computation is required, but `estimate` is constant and has 0 standard deviation, resulting in a divide by 0 error. `NA` will be returned.”
+# This warning message can be eliminated with a small script to drop NA values. This warning message has not any effect in further script steps.
+
+# Start system time for runtime analysis
+timestart <- Sys.time()
+
+# Performance comparison of models
+# Maximum Model 1 RegressionlmMaximum
+PerformancelmMaximum <- GP2Smetrics(PredictionAllDataTestSetsMaximum, truth = MaximumElectricityConsumptionkWh, estimate = PredictionRegressionlmMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformancelmMaximum)
+
+# Maximum Model 2 RegressionglmMaximum
+PerformanceglmMaximum <- GP2Smetrics(PredictionAllDataTestSetsMaximum, truth = MaximumElectricityConsumptionkWh, estimate = PredictionRegressionglmMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceglmMaximum)
+
+# Maximum Model 3 RegressionparsniplmMaximum
+PerformanceparsniplmMaximum <- GP2Smetrics(PredictionAllDataTestSetsMaximum, truth = MaximumElectricityConsumptionkWh, estimate = PredictionRegressionparsniplmMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceparsniplmMaximum)
+
+# Maximum Model 4 Regressionparsnipglmnet001lassoMaximum
+PerformanceRegressionparsnipglmnet001lassoMaximum <- GP2Smetrics(PredictionAllDataTestSetsMaximum, truth = MaximumElectricityConsumptionkWh, estimate = PredictionRegressionparsnipglmnet001lassoMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceRegressionparsnipglmnet001lassoMaximum)
+
+# Maximum Model 5 Regressionparsnipglmnet001ridgeMaximum
+PerformanceRegressionparsnipglmnet001ridgeMaximum <- GP2Smetrics(PredictionAllDataTestSetsMaximum, truth = MaximumElectricityConsumptionkWh, estimate = PredictionRegressionparsnipglmnet001ridgeMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceRegressionparsnipglmnet001ridgeMaximum)
+
+# Maximum Model 6 Regressionparsnipglmnet1lassoMaximum
+PerformanceRegressionparsnipglmnet1lassoMaximum <- GP2Smetrics(PredictionAllDataTestSetsMaximum, truth = MaximumElectricityConsumptionkWh, estimate = PredictionRegressionparsnipglmnet1lassoMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceRegressionparsnipglmnet1lassoMaximum)
+
+# Maximum Model 7 Regressionparsnipglmnet1ridgeMaximum
+PerformanceRegressionparsnipglmnet1ridgeMaximum <- GP2Smetrics(PredictionAllDataTestSetsMaximum, truth = MaximumElectricityConsumptionkWh, estimate = PredictionRegressionparsnipglmnet1ridgeMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceRegressionparsnipglmnet1ridgeMaximum)
+
+# Maximum Model 8 AutoARIMAMaximum
+PerformanceAutoARIMAMaximum <- GP2Smetrics(PredictionAllDataTestSetsMaximum, truth = MaximumElectricityConsumptionkWh, estimate = PredictionAutoARIMAMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceAutoARIMAMaximum)
+
+# Maximum Model 9 ARIMA112Maximum
+PerformanceARIMA112Maximum <- GP2Smetrics(PredictionAllDataTestSetsMaximum, truth = MaximumElectricityConsumptionkWh, estimate = PredictionARIMA112Maximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceARIMA112Maximum)
+
+# Maximum Model 10 ARIMA1110Maximum
+PerformanceARIMA1110Maximum <- GP2Smetrics(PredictionAllDataTestSetsMaximum, truth = MaximumElectricityConsumptionkWh, estimate = PredictionARIMA1110Maximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceARIMA1110Maximum)
+
+# Combine performance maximum as dataframe/tidyverse tibbles
+PerformanceModelsMaximum <- bind_cols(PerformancelmMaximum, PerformanceglmMaximum$.estimate, PerformanceparsniplmMaximum$.estimate, PerformanceRegressionparsnipglmnet001lassoMaximum$.estimate, PerformanceRegressionparsnipglmnet001ridgeMaximum$.estimate, PerformanceRegressionparsnipglmnet1lassoMaximum$.estimate,
+PerformanceRegressionparsnipglmnet1ridgeMaximum$.estimate, PerformanceAutoARIMAMaximum$.estimate, PerformanceARIMA112Maximum$.estimate, PerformanceARIMA1110Maximum$.estimate)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceModelsMaximum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(PerformanceModelsMaximum)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (PerformanceModelsMaximum) <- c("Metric","Estimator","PerformancelmMaximum","PerformanceglmMaximum","PerformanceparsniplmMaximum","Performanceparsnipglmnet001lassoMaximum","Performanceparsnipglmnet001ridgeMaximum","Performanceparsnipglmnet1lassoMaximum","Performanceparsnipglmnet1ridgeMaximum","PerformanceAutoARIMAMaximum","PerformanceARIMA112Maximum","PerformanceARIMA1110Maximum")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceModelsMaximum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(PerformanceModelsMaximum)
+
+# Write summary dataframe/tidyverse tibbles file by write_csv():comma delimited csv file
+readr::write_csv(PerformanceModelsMaximum, "WRPerformanceModelsMaximum.csv")
+
+# Convert prediction in all test set dataframe/tidyverse tibbles
+PerformanceModelsMaximumtibble <- tibble::as_tibble(PerformanceModelsMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PerformanceModelsMaximumtibble)
+
+# Write prediction in all test set dataframe/tidyverse tibbles file by write_delim(): blank delimited txt file
+readr::write_delim(PerformanceModelsMaximumtibble, "WRPerformanceModelsMaximumtibble.txt")
+# Write prediction in all test set dataframe/tidyverse tibbles file by write_csv():comma delimited csv file
+readr::write_csv(PerformanceModelsMaximumtibble, "WRPerformanceModelsMaximumtibble.csv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print runtime *checkpoint*
+print(executiontime)
+# Metrics: 1 rmse numeric_metric minimize 2 rsq numeric_metric maximize 3 rsq_trad numeric_metric maximize 4 msd numeric_metric zero 5 mae numeric_metric minimize 6 mpe numeric_metric zero 7 mape numeric_metric minimize 8 smape numeric_metric minimize 9 mase numeric_metric minimize 10 ccc numeric_metric maximize
+# References, additional info, etc.
+# https://yardstick.tidymodels.org/index.html
+# https://yardstick.tidymodels.org/reference/metric_set.html
+# https://yardstick.tidymodels.org/reference/index.html
+# https://dplyr.tidyverse.org/reference/bind.html
+# https://dplyr.tidyverse.org/reference/bind.html
+# https://dplyr.tidyverse.org/reference/rename.html
+# https://rdrr.io/r/base/colnames.html
+
+
+
+# Code/script block 13
+# Plots of actuals (all set) and predictions (test set) (ex-post, backward, historical) lineplots with ggplot2 and ggMarginal, and save them in the folder 
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Select prediction data models of minimum for lineplots 
+WorldPredictionDataTestSetsMinimum <- PredictionAllDataTestSetsMinimum %>%
+dplyr::select(Year, PredictionRegressionlmMinimum, PredictionAutoARIMAMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(WorldPredictionDataTestSetsMinimum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(WorldPredictionDataTestSetsMinimum)
+
+# Select prediction data models of maximum for lineplots 
+WorldPredictionDataTestSetsMaximum <- PredictionAllDataTestSetsMaximum %>%
+dplyr::select(Year, PredictionRegressionlmMaximum, PredictionAutoARIMAMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(WorldPredictionDataTestSetsMaximum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(WorldPredictionDataTestSetsMaximum)
+
+# Join prediction data models minimum and maximum
+WorldPredictionDataTestSetsJoin <- dplyr::full_join(WorldPredictionDataTestSetsMinimum, WorldPredictionDataTestSetsMaximum, by = "Year")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(WorldPredictionDataTestSetsJoin)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(WorldPredictionDataTestSetsJoin)
+
+# Join actuals and test predictions minimum
+WorldActualTestPredictionJoin <- dplyr::full_join(GP2SWorld, WorldPredictionDataTestSetsJoin, by = "Year")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(WorldActualTestPredictionJoin)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(WorldActualTestPredictionJoin)
+
+# Gather each time series data for lineplots
+WorldActualTestPredictionJoinNoYear <- WorldActualTestPredictionJoin %>%
+gather(key = "variable", value = "value", MinimumElectricityConsumptionkWh, MaximumElectricityConsumptionkWh, PredictionRegressionlmMinimum, PredictionAutoARIMAMinimum, PredictionRegressionlmMaximum, PredictionAutoARIMAMaximum, -Year)
+# Print plot dataframe/tidyverse tibbles
+print(WorldActualTestPredictionJoinNoYear)
+# gather “Warning message: attributes are not identical across measure variables; they will be dropped”
+# This warning message can be eliminated with a small script to drop NA values. This warning message has not any effect in further script steps.
+
+# Electricity Consumption(kWh)actuals and predictions in test set lineplot
+WorldActualTestPredictionJoinLinePlot <- ggplot(WorldActualTestPredictionJoinNoYear, aes(x = Year, y = value, color = variable)) + 
+  geom_line(size = 1.0)+
+  geom_point(size=2.0)+
+  scale_color_discrete(name = "Electricity Consumption Datasets & Predictions Of Models In Test Sets", labels = c("MinimumElectricityConsumptionkWh" = "Minimum Electricity Consumption Dataset (kWh)", "MaximumElectricityConsumptionkWh" = "Maximum Electricity Consumption Dataset (kWh)", "PredictionRegressionlmMinimum" = "Minimum Electricity Consumption Prediction, Linear Regression with lm() (kWh)", "PredictionAutoARIMAMinimum" = "Minimum Electricity Consumption Prediction, Automatic ARIMA (kWh), the best one amongst these ten models", "PredictionRegressionlmMaximum" = "Maximum Electricity Consumption Prediction, Linear Regression with lm() (kWh)", "PredictionAutoARIMAMaximum" = "Maximum Electricity Consumption Prediction, Automatic ARIMA (kWh), the best one amongst these ten models")) +
+  scale_x_continuous(name="Years")+
+  scale_y_continuous(name="Electricity Consumption (kWh)\n in billions (1000000000s) or in terawatt-hours (TWh)", labels=label_number(scale = 1/1000000000))+
+  labs(title="Electricity Consumption", caption = "Data: Global Power Prediction Systems Robot and Platform, World 1971-2018\n (as octonary or later level source, researcher’s own work generated based on datasources)")+
+  coord_cartesian(clip = "off")+
+  theme_bw(base_size = 12)+
+  theme(legend.position = "bottom",  legend.justification ="top", legend.direction = "vertical", legend.box="horizontal", legend.box.just="top")
+plot(WorldActualTestPredictionJoinLinePlot)
+WorldActualTestPredictionJoinLinePlotggMarginal <- ggMarginal(WorldActualTestPredictionJoinLinePlot, groupColour = TRUE, groupFill = TRUE, margins = "y", type="histogram")
+plot(WorldActualTestPredictionJoinLinePlotggMarginal)
+ggsave("WRWorldActualTestPredictionJoinLinePlotggMarginal.jpeg", plot= WorldActualTestPredictionJoinLinePlotggMarginal, width = 11, height = 7)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print total runtime *checkpoint*
+print(executiontime)
+# References, additional info, etc.
+# https://tidyr.tidyverse.org/reference/gather.html
+# https://rstudio-pubs-static.s3.amazonaws.com/282405_e280f5f0073544d7be417cde893d78d0.html
+# https://statisticsglobe.com/r-draw-multiple-lines-to-same-ggplot2-plot
+# https://www.r-graph-gallery.com/time-series.html
+# https://ggplot2.tidyverse.org/articles/articles/faq-customising.html
+# https://ggplot2.tidyverse.org/articles/articles/faq-axes.html
+# https://scales.r-lib.org/reference/label_number.html
+# gather “Warning message: 1: Removed 132 row(s) containing missing values (geom_path). 2: Removed 132 rows containing missing values (geom_point).”
+# This warning message can be eliminated with a small script to drop NA values. This warning message has not any effect in further script steps.
+# “Warning messages: 1: Removed 132 row(s) containing missing values (geom_path). 2: Removed 132 rows containing missing values (geom_point).”
+# This warning message can be eliminated with a small script to drop NA values. This warning message has not any effect in further script steps.
+# “Warning messages: 1: Removed 132 row(s) containing missing values (geom_path). 2: Removed 132 rows containing missing values (geom_point). 3: Removed 132 row(s) containing missing values (geom_path). 4: Removed 132 rows containing missing values (geom_point).”
+# This warning message can be eliminated with a small script to drop NA values. This warning message has not any effect in further script steps.
+
+
+# Code/script block 14
+# Prediction of models (ex-ante, forward, projections) with confidence and prediction intervals (confidence intervals, prediction intervals and tolerance intervals)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Historical data year column
+ExPostYear <- GP2SWorld %>%
+dplyr::select(Year)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExPostYear)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExPostYear)
+
+# Prediction period
+ExAntePredictionPeriodTibble = tibble::tibble(Year = (max(ExPostYear$Year)+1):(max(ExPostYear$Year)+1+500))
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionPeriodTibble)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionPeriodTibble)
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print total runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Minimum Model 1 RegressionlmMinimum with 95% confidence interval
+ExAntePredictionRegressionlmMinimumcon95 <- RegressionlmMinimum %>%
+stats::predict(ExAntePredictionPeriodTibble, interval = "confidence", level=0.95)
+ExAntePredictionRegressionlmMinimumcon95 <- tibble::as.tibble(ExAntePredictionRegressionlmMinimumcon95)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMinimumcon95)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMinimumcon95)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (ExAntePredictionRegressionlmMinimumcon95) <- c("ExAntePredictionRegressionlmMinimumcon95fit","ExAntePredictionRegressionlmMinimumcon95lower","ExAntePredictionRegressionlmMinimumcon95upper")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMinimumcon95)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMinimumcon95)
+
+# Minimum Model 1 RegressionlmMinimum with 80% confidence interval
+ExAntePredictionRegressionlmMinimumcon80 <- RegressionlmMinimum %>%
+stats::predict(ExAntePredictionPeriodTibble, interval = "confidence", level=0.80)
+ExAntePredictionRegressionlmMinimumcon80 <- tibble::as.tibble(ExAntePredictionRegressionlmMinimumcon80)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMinimumcon80)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMinimumcon80)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (ExAntePredictionRegressionlmMinimumcon80) <- c("ExAntePredictionRegressionlmMinimumcon80fit","ExAntePredictionRegressionlmMinimumcon80lower","ExAntePredictionRegressionlmMinimumcon80upper")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMinimumcon80)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMinimumcon80)
+
+# Minimum Model 1 RegressionlmMinimum with 95% prediction interval
+ExAntePredictionRegressionlmMinimumpre95 <- RegressionlmMinimum %>%
+stats::predict(ExAntePredictionPeriodTibble, interval = "prediction", level=0.95)
+ExAntePredictionRegressionlmMinimumpre95 <- tibble::as.tibble(ExAntePredictionRegressionlmMinimumpre95)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMinimumpre95)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMinimumpre95)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (ExAntePredictionRegressionlmMinimumpre95) <- c("ExAntePredictionRegressionlmMinimumpre95fit","ExAntePredictionRegressionlmMinimumpre95lower","ExAntePredictionRegressionlmMinimumpre95upper")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMinimumpre95)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMinimumpre95)
+
+# Minimum Model 1 RegressionlmMinimum with 80% prediction interval
+ExAntePredictionRegressionlmMinimumpre80 <- RegressionlmMinimum %>%
+stats::predict(ExAntePredictionPeriodTibble, interval = "prediction", level=0.80)
+ExAntePredictionRegressionlmMinimumpre80 <- tibble::as.tibble(ExAntePredictionRegressionlmMinimumpre80)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMinimumpre80)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMinimumpre80)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (ExAntePredictionRegressionlmMinimumpre80) <- c("ExAntePredictionRegressionlmMinimumpre80fit","ExAntePredictionRegressionlmMinimumpre80lower","ExAntePredictionRegressionlmMinimumpre80upper")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMinimumpre80)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMinimumpre80)
+
+# Combine RegressionlmMinimum prediction as dataframe/tidyverse tibbles
+ExAntePredictionRegressionlmMinimum <- bind_cols(ExAntePredictionRegressionlmMinimumcon95, ExAntePredictionRegressionlmMinimumcon80, ExAntePredictionRegressionlmMinimumpre95, ExAntePredictionRegressionlmMinimumpre80)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMinimum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMinimum)
+
+# Minimum Electricity Consumption (kWh) “forecast” data period count, (Model 8 AutoARIMA)
+PredictionPeriod <- count(ExAntePredictionPeriodTibble)
+PredictionPeriod <- as.numeric(PredictionPeriod)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(PredictionPeriod)
+
+# Run period (Model 8 AutoARIMA)
+RunPeriod <- PredictionPeriod + TestPeriod
+RunPeriod <- as.numeric(RunPeriod)
+# Print *checkpoint*
+print(RunPeriod)
+
+# Minimum Model 8 AutoARIMA
+ExAntePredictionAutoARIMAMinimum <- forecast(AutoARIMAMinimum, h= RunPeriod)
+ExAntePredictionAutoARIMAMinimum <- tibble::as.tibble(ExAntePredictionAutoARIMAMinimum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionAutoARIMAMinimum)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (ExAntePredictionAutoARIMAMinimum) <- c("ExAntePredictionAutoARIMAMinimumpointforecast","ExAntePredictionAutoARIMAMinimum80conlower", "ExAntePredictionAutoARIMAMinimum80conupper", "ExAntePredictionAutoARIMAMinimum95conlower", "ExAntePredictionAutoARIMAMinimum95conupper")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionAutoARIMAMinimum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionAutoARIMAMinimum)
+
+# Prediction tibble Model 8 AutoARIMA (bottom rows selection) 
+ExAntePredictionAutoARIMAMinimumSlice <- dplyr::slice_tail(ExAntePredictionAutoARIMAMinimum, n = PredictionPeriod)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionAutoARIMAMinimumSlice)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionAutoARIMAMinimumSlice)
+
+# Combine minimum prediction as dataframe/tidyverse tibbles
+ExAntePredictionMinimum <- bind_cols(ExAntePredictionPeriodTibble, ExAntePredictionRegressionlmMinimum, ExAntePredictionAutoARIMAMinimumSlice)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionMinimum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionMinimum)
+
+# Write exante prediction dataframe/tidyverse tibbles file by write_delim(): blank delimited txt file
+readr::write_delim(ExAntePredictionMinimum, "WRExAntePredictionMinimum.txt")
+# Write exante prediction dataframe/tidyverse tibbles file by write_csv():comma delimited csv file
+readr::write_csv(ExAntePredictionMinimum, "WRExAntePredictionMinimum.csv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print total runtime *checkpoint*
+print(executiontime)
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Maximum Model 1 RegressionlmMaximum with 95% confidence interval
+ExAntePredictionRegressionlmMaximumcon95 <- RegressionlmMaximum %>%
+stats::predict(ExAntePredictionPeriodTibble, interval = "confidence", level=0.95)
+ExAntePredictionRegressionlmMaximumcon95 <- tibble::as.tibble(ExAntePredictionRegressionlmMaximumcon95)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMaximumcon95)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMaximumcon95)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (ExAntePredictionRegressionlmMaximumcon95) <- c("ExAntePredictionRegressionlmMaximumcon95fit","ExAntePredictionRegressionlmMaximumcon95lower","ExAntePredictionRegressionlmMaximumcon95upper")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMaximumcon95)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMaximumcon95)
+
+# Maximum Model 1 RegressionlmMaximum with 80% confidence interval
+ExAntePredictionRegressionlmMaximumcon80 <- RegressionlmMaximum %>%
+stats::predict(ExAntePredictionPeriodTibble, interval = "confidence", level=0.80)
+ExAntePredictionRegressionlmMaximumcon80 <- tibble::as.tibble(ExAntePredictionRegressionlmMaximumcon80)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMaximumcon80)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMaximumcon80)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (ExAntePredictionRegressionlmMaximumcon80) <- c("ExAntePredictionRegressionlmMaximumcon80fit","ExAntePredictionRegressionlmMaximumcon80lower","ExAntePredictionRegressionlmMaximumcon80upper")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMaximumcon80)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMaximumcon80)
+
+# Maximum Model 1 RegressionlmMaximum with 95% prediction interval
+ExAntePredictionRegressionlmMaximumpre95 <- RegressionlmMaximum %>%
+stats::predict(ExAntePredictionPeriodTibble, interval = "prediction", level=0.95)
+ExAntePredictionRegressionlmMaximumpre95 <- tibble::as.tibble(ExAntePredictionRegressionlmMaximumpre95)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMaximumpre95)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMaximumpre95)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (ExAntePredictionRegressionlmMaximumpre95) <- c("ExAntePredictionRegressionlmMaximumpre95fit","ExAntePredictionRegressionlmMaximumpre95lower","ExAntePredictionRegressionlmMaximumpre95upper")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMaximumpre95)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMaximumpre95)
+
+# Maximum Model 1 RegressionlmMaximum with 80% prediction interval
+ExAntePredictionRegressionlmMaximumpre80 <- RegressionlmMaximum %>%
+stats::predict(ExAntePredictionPeriodTibble, interval = "prediction", level=0.80)
+ExAntePredictionRegressionlmMaximumpre80 <- tibble::as.tibble(ExAntePredictionRegressionlmMaximumpre80)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMaximumpre80)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMaximumpre80)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (ExAntePredictionRegressionlmMaximumpre80) <- c("ExAntePredictionRegressionlmMaximumpre80fit","ExAntePredictionRegressionlmMaximumpre80lower","ExAntePredictionRegressionlmMaximumpre80upper")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMaximumpre80)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMaximumpre80)
+
+# Combine RegressionlmMaximum prediction as dataframe/tidyverse tibbles
+ExAntePredictionRegressionlmMaximum <- bind_cols(ExAntePredictionRegressionlmMaximumcon95, ExAntePredictionRegressionlmMaximumcon80, ExAntePredictionRegressionlmMaximumpre95, ExAntePredictionRegressionlmMaximumpre80)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionRegressionlmMaximum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionRegressionlmMaximum)
+
+# Maximum Model 8 AutoARIMA
+ExAntePredictionAutoARIMAMaximum <- forecast(AutoARIMAMaximum, h= RunPeriod)
+ExAntePredictionAutoARIMAMaximum <- tibble::as.tibble(ExAntePredictionAutoARIMAMaximum)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionAutoARIMAMaximum)
+
+# Revise, change column names of dataframe/tidyverse tibbles
+colnames (ExAntePredictionAutoARIMAMaximum) <- c("ExAntePredictionAutoARIMAMaximumpointforecast","ExAntePredictionAutoARIMAMaximum80conlower", "ExAntePredictionAutoARIMAMaximum80conupper", "ExAntePredictionAutoARIMAMaximum95conlower", "ExAntePredictionAutoARIMAMaximum95conupper")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionAutoARIMAMaximum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionAutoARIMAMaximum)
+
+# Prediction tibble Model 8 AutoARIMA (bottom rows selection) 
+ExAntePredictionAutoARIMAMaximumSlice <- dplyr::slice_tail(ExAntePredictionAutoARIMAMaximum, n = PredictionPeriod)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionAutoARIMAMaximumSlice)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionAutoARIMAMaximumSlice)
+
+# Combine Maximum prediction as dataframe/tidyverse tibbles
+ExAntePredictionMaximum <- bind_cols(ExAntePredictionPeriodTibble, ExAntePredictionRegressionlmMaximum, ExAntePredictionAutoARIMAMaximumSlice)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAntePredictionMaximum)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAntePredictionMaximum)
+
+# Write exante prediction dataframe/tidyverse tibbles file by write_delim(): blank delimited txt file
+readr::write_delim(ExAntePredictionMaximum, "WRExAntePredictionMaximum.txt")
+# Write exante prediction dataframe/tidyverse tibbles file by write_csv():comma delimited csv file
+readr::write_csv(ExAntePredictionMaximum, "WRExAntePredictionMaximum.csv")
+
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print total runtime *checkpoint*
+print(executiontime)
+# References, additional info, etc.
+# https://rpubs.com/Bio-Geek/71339
+# https://stackoverflow.com/questions/10304924/predicting-values-using-arima-model-for-periods-that-are-not-ahead-the-end-of-th
+# https://robjhyndman.com/hyndsight/forecast-combinations/
+# https://www.rdocumentation.org/packages/forecast/versions/8.15
+# https://stackoverflow.com/questions/67158692/why-forecastmodel-h-2-function-returns-na-value-model-is-from-r-auto-arima
+# https://stackoverflow.com/questions/23299684/r-error-in-xed-operator-is-invalid-for-atomic-vectors
+# https://dplyr.tidyverse.org/reference/slice.html
+# ExAntePredictionRegressionlmMinimumcon95fit, ExAntePredictionRegressionlmMinimumcon80fit, ExAntePredictionRegressionlmMinimumpre95fit, ExAntePredictionRegressionlmMinimumpre80fit tibbles are the same.
+
+
+# Code/script block 15
+# Plots predictions (ex-ante, forward, projections) lineplots with ggplot2, and save them in the folder 
+
+# Start system time for runtime analysis *checkpoint*
+timestart <- Sys.time()
+
+# Join exante maximum and exante minimum prediction data models minimum and maximum
+ExAnteWorldPredictionJoin <- dplyr::full_join(ExAntePredictionMinimum, ExAntePredictionMaximum, by = "Year")
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAnteWorldPredictionJoin)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAnteWorldPredictionJoin)
+
+# Rearrange tibble for plot
+ExAnteWorldPredictionJoin <- ExAnteWorldPredictionJoin %>%
+dplyr::select(-ExAntePredictionRegressionlmMinimumcon80fit, -ExAntePredictionRegressionlmMinimumpre95fit, -ExAntePredictionRegressionlmMinimumpre80fit, -ExAntePredictionRegressionlmMaximumcon80fit, -ExAntePredictionRegressionlmMaximumpre95fit, -ExAntePredictionRegressionlmMaximumpre80fit)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ExAnteWorldPredictionJoin)
+# View dataframe/tidyverse tibbles *checkpoint*
+view(ExAnteWorldPredictionJoin)
+
+# Get color information of the test sets plot for exante predictions lineplot with confidence and prediction intervals
+ColorInformation <- ggplot_build(WorldActualTestPredictionJoinLinePlot)
+print(ColorInformation)
+# Extend options to maximum print
+options(max.print = 99999999)
+# Print dataframe/tidyverse tibbles *checkpoint*
+print(ColorInformation)
+# Maximum Electricity Consumption Prediction, Automatic ARIMA (kWh), the best one amongst these ten models color: #00BA38 https://www.colorhexa.com/00ba38
+# Maximum Electricity Consumption Prediction, Linear Regression lm() (kWh) color: #619cff https://www.colorhexa.com/619cff
+# Minimum Electricity Consumption Prediction, Automatic ARIMA (kWh), the best one amongst these ten models in the test set color: #00bfc4 https://www.colorhexa.com/00bfc4
+# Minimum Electricity Consumption Prediction, Linear Regression lm() (kWh) color: #f564e3 https://www.colorhexa.com/f564e3
+
+
+# Color information of the exante predictions linear regression lineplot
+ColorsExAnteLM <- c("ExAntePredictionRegressionlmMinimumcon95fit"= "#f564e3", "ExAntePredictionRegressionlmMaximumcon95fit"= "#619cff")
+
+# Gather each time series data for linear regression lineplots
+ExAntePredictionLMLinePlot <- ExAnteWorldPredictionJoin %>%
+gather(key = "variable", value = "value", ExAntePredictionRegressionlmMinimumcon95fit, ExAntePredictionRegressionlmMaximumcon95fit, -Year)
+ExAntePredictionLMLinePlot <- tibble::as.tibble(ExAntePredictionLMLinePlot)
+# Print plot dataframe/tidyverse tibbles
+print(ExAntePredictionLMLinePlot)
+
+# Electricity Consumption(kWh) actuals and predictions linear regression and ARIMA lineplot
+ExAntePredictionLMLinePlot <- ggplot(ExAntePredictionLMLinePlot, aes(x = Year, y = value, color = variable)) + 
+  geom_line(size = 0.8)+
+  scale_color_manual(name = "Electricity Consumption Predictions Of Models", values = ColorsExAnteLM, labels = c("ExAntePredictionRegressionlmMinimumcon95fit" = "Minimum Electricity Consumption Prediction, Linear Regression (kWh)", "ExAntePredictionRegressionlmMaximumcon95fit" = "Maximum Electricity Consumption Prediction, Linear Regression (kWh)")) +
+  scale_x_continuous(name="Years")+
+  scale_y_continuous(name="Electricity Consumption (kWh)\n in billions (1000000000s) or in terawatt-hours (TWh)", labels=label_number(scale = 1/1000000000))+
+  labs(title="Electricity Consumption Predictions", caption = " Global Power Prediction Systems Robot and Platform, World 2019-2519 Prediction, researcher’s own work")+
+  coord_cartesian(clip = "off")+
+  theme_bw(base_size = 12)+
+  theme(legend.position = "bottom",  legend.justification ="top", legend.direction = "vertical", legend.box="horizontal", legend.box.just="top")
+plot(ExAntePredictionLMLinePlot)
+ggsave("WRWorldExAntePredictionLMLinePlot.jpeg", plot= ExAntePredictionLMLinePlot, width = 11, height = 7)
+
+# Color information of the exante predictions ARIMA lineplot
+ColorsExAnteARIMA <- c("ExAntePredictionAutoARIMAMinimumpointforecast"= "#00bfc4", "ExAntePredictionAutoARIMAMaximumpointforecast"= "#00BA38")
+
+# Gather each time series data for linear regression and ARIMA lineplots
+ExAntePredictionARIMALinePlot <- ExAnteWorldPredictionJoin %>%
+gather(key = "variable", value = "value", ExAntePredictionAutoARIMAMinimumpointforecast, ExAntePredictionAutoARIMAMaximumpointforecast, -Year)
+ExAntePredictionARIMALinePlot <- tibble::as.tibble(ExAntePredictionARIMALinePlot)
+# Print plot dataframe/tidyverse tibbles
+print(ExAntePredictionARIMALinePlot)
+
+# Electricity Consumption(kWh) actuals and predictions linear regression and ARIMA lineplot
+ExAntePredictionARIMALinePlot <- ggplot(ExAntePredictionARIMALinePlot, aes(x = Year, y = value, color = variable)) + 
+  geom_line(size = 0.8)+
+  scale_color_manual(name = "Electricity Consumption Predictions Of Models", values = ColorsExAnteARIMA, labels = c("ExAntePredictionAutoARIMAMinimumpointforecast" = "Minimum Electricity Consumption Prediction, Automatic ARIMA (kWh), the best one amongst these ten models in the test set", "ExAntePredictionAutoARIMAMaximumpointforecast" = "Maximum Electricity Consumption Prediction, Automatic ARIMA (kWh), the best one amongst these ten models in the test set")) +
+  scale_x_continuous(name="Years")+
+  scale_y_continuous(name="Electricity Consumption (kWh)\n in billions (1000000000s) or in terawatt-hours (TWh)", breaks=scales:: breaks_extended(15), labels=label_number(scale = 1/1000000000))+
+  labs(title="Electricity Consumption Predictions", caption = " Global Power Prediction Systems Robot and Platform, World 2019-2519 Prediction, researcher’s own work")+
+  coord_cartesian(clip = "off")+
+  theme_bw(base_size = 12)+
+  theme(legend.position = "bottom",  legend.justification ="top", legend.direction = "vertical", legend.box="horizontal", legend.box.just="top")
+plot(ExAntePredictionARIMALinePlot)
+ggsave("WRWorldExAntePredictionARIMALinePlot.jpeg", plot= ExAntePredictionARIMALinePlot, width = 11, height = 7)
+
+
+# Color information of the exante predictions linear regression and ARIMA lineplot
+ColorsExAnteLMARIMA <- c("ExAntePredictionRegressionlmMinimumcon95fit"= "#f564e3", "ExAntePredictionAutoARIMAMinimumpointforecast"= "#00bfc4", "ExAntePredictionRegressionlmMaximumcon95fit"= "#619cff", "ExAntePredictionAutoARIMAMaximumpointforecast"= "#00BA38")
+
+# Gather each time series data for linear regression and ARIMA lineplots
+ExAntePredictionLMARIMALinePlot <- ExAnteWorldPredictionJoin %>%
+gather(key = "variable", value = "value", ExAntePredictionRegressionlmMinimumcon95fit, ExAntePredictionAutoARIMAMinimumpointforecast, ExAntePredictionRegressionlmMaximumcon95fit, ExAntePredictionAutoARIMAMaximumpointforecast, -Year)
+ExAntePredictionLMARIMALinePlot <- tibble::as.tibble(ExAntePredictionLMARIMALinePlot)
+# Print plot dataframe/tidyverse tibbles
+print(ExAntePredictionLMARIMALinePlot)
+
+# Electricity Consumption(kWh) actuals and predictions linear regression and ARIMA lineplot
+ExAntePredictionLMARIMALinePlot <- ggplot(ExAntePredictionLMARIMALinePlot, aes(x = Year, y = value, color = variable)) + 
+  geom_line(size = 0.8)+
+  scale_color_manual(name = "Electricity Consumption Predictions Of Models", values = ColorsExAnteLMARIMA, labels = c("ExAntePredictionRegressionlmMinimumcon95fit" = "Minimum Electricity Consumption Prediction, Linear Regression (kWh)", "ExAntePredictionAutoARIMAMinimumpointforecast" = "Minimum Electricity Consumption Prediction, Automatic ARIMA (kWh), the best one amongst these ten models in the test set", "ExAntePredictionRegressionlmMaximumcon95fit" = "Maximum Electricity Consumption Prediction, Linear Regression (kWh)", "ExAntePredictionAutoARIMAMaximumpointforecast" = "Maximum Electricity Consumption Prediction, Automatic ARIMA (kWh), the best one amongst these ten models in the test set")) +
+  scale_x_continuous(name="Years")+
+  scale_y_continuous(name="Electricity Consumption (kWh)\n in billions (1000000000s) or in terawatt-hours (TWh)", breaks=scales:: breaks_extended(15), labels=label_number(scale = 1/1000000000))+
+  labs(title="Electricity Consumption Predictions", caption = " Global Power Prediction Systems Robot and Platform, World 2019-2519 Prediction, researcher’s own work")+
+  coord_cartesian(clip = "off")+
+  theme_bw(base_size = 12)+
+  theme(legend.position = "bottom",  legend.justification ="top", legend.direction = "vertical", legend.box="horizontal", legend.box.just="top")
+plot(ExAntePredictionLMARIMALinePlot)
+ggsave("WRWorldExAntePredictionLMARIMALinePlot.jpeg", plot= ExAntePredictionLMARIMALinePlot, width = 11, height = 7)
+
+
+# Color information of the exante predictions lineplot with confidence and prediction intervals
+ColorsExAnteLMARIMAIntervals <- c("ExAntePredictionRegressionlmMinimumpre95lower"="#f564e3", "ExAntePredictionRegressionlmMinimumpre95upper"= "#f564e3", "ExAntePredictionRegressionlmMinimumcon95lower"= "#f564e3", "ExAntePredictionRegressionlmMinimumcon95upper"= "#f564e3", "ExAntePredictionRegressionlmMinimumpre80lower"= "#f564e3", "ExAntePredictionRegressionlmMinimumpre80upper"= "#f564e3", "ExAntePredictionRegressionlmMinimumcon80lower"= "#f564e3", "ExAntePredictionRegressionlmMinimumcon80upper"= "#f564e3", "ExAntePredictionRegressionlmMinimumcon95fit"= "#f564e3", "ExAntePredictionAutoARIMAMinimum95conlower"= "#00bfc4", "ExAntePredictionAutoARIMAMinimum95conupper"= "#00bfc4", "ExAntePredictionAutoARIMAMinimum80conlower"= "#00bfc4", "ExAntePredictionAutoARIMAMinimum80conupper"= "#00bfc4", "ExAntePredictionAutoARIMAMinimumpointforecast"= "#00bfc4", "ExAntePredictionRegressionlmMaximumpre95lower"= "#619cff", "ExAntePredictionRegressionlmMaximumpre95upper"= "#619cff", "ExAntePredictionRegressionlmMaximumcon95lower"= "#619cff", "ExAntePredictionRegressionlmMaximumcon95upper"= "#619cff", "ExAntePredictionRegressionlmMaximumpre80lower"= "#619cff", "ExAntePredictionRegressionlmMaximumpre80upper"= "#619cff", "ExAntePredictionRegressionlmMaximumcon80lower"= "#619cff", "ExAntePredictionRegressionlmMaximumcon80upper"= "#619cff", "ExAntePredictionRegressionlmMaximumcon95fit"= "#619cff", "ExAntePredictionAutoARIMAMaximum95conlower"= "#00BA38", "ExAntePredictionAutoARIMAMaximum95conupper"= "#00BA38", "ExAntePredictionAutoARIMAMaximum80conlower"= "#00BA38", "ExAntePredictionAutoARIMAMaximum80conupper"= "#00BA38", "ExAntePredictionAutoARIMAMaximumpointforecast"= "#00BA38")
+
+# Gather each exante prediction for exante predictions lineplot with confidence and prediction intervals
+ExAnteWorldPredictionJoinNoYear <- ExAnteWorldPredictionJoin %>%
+gather(key = "variable", value = "value", ExAntePredictionRegressionlmMinimumpre95lower, ExAntePredictionRegressionlmMinimumpre95upper, ExAntePredictionRegressionlmMinimumcon95lower, ExAntePredictionRegressionlmMinimumcon95upper, ExAntePredictionRegressionlmMinimumpre80lower, ExAntePredictionRegressionlmMinimumpre80upper, ExAntePredictionRegressionlmMinimumcon80lower, ExAntePredictionRegressionlmMinimumcon80upper, ExAntePredictionRegressionlmMinimumcon95fit, ExAntePredictionAutoARIMAMinimum95conlower, ExAntePredictionAutoARIMAMinimum95conupper, ExAntePredictionAutoARIMAMinimum80conlower, ExAntePredictionAutoARIMAMinimum80conupper, ExAntePredictionAutoARIMAMinimumpointforecast, ExAntePredictionRegressionlmMaximumpre95lower, ExAntePredictionRegressionlmMaximumpre95upper, ExAntePredictionRegressionlmMaximumcon95lower, ExAntePredictionRegressionlmMaximumcon95upper, ExAntePredictionRegressionlmMaximumpre80lower, ExAntePredictionRegressionlmMaximumpre80upper, ExAntePredictionRegressionlmMaximumcon80lower, ExAntePredictionRegressionlmMaximumcon80upper, ExAntePredictionRegressionlmMaximumcon95fit, ExAntePredictionAutoARIMAMaximum95conlower, ExAntePredictionAutoARIMAMaximum95conupper, ExAntePredictionAutoARIMAMaximum80conlower, ExAntePredictionAutoARIMAMaximum80conupper, ExAntePredictionAutoARIMAMaximumpointforecast, -Year)
+# Print plot dataframe/tidyverse tibbles
+print(ExAnteWorldPredictionJoinNoYear)
+
+
+# Electricity Consumption (kWh) exante predictions lineplot with confidence and prediction intervals
+ExAntePredictionPlotIntervals <- ggplot(ExAnteWorldPredictionJoinNoYear, aes(x = Year, y = value, color = variable)) + 
+  geom_line(size = 0.8)+
+  scale_color_manual(name = "Electricity Consumption Predictions Of Models", values = ColorsExAnteLMARIMAIntervals, limits = c("ExAntePredictionRegressionlmMinimumcon95fit", "ExAntePredictionAutoARIMAMinimumpointforecast", "ExAntePredictionRegressionlmMaximumcon95fit", "ExAntePredictionAutoARIMAMaximumpointforecast"), labels = c("ExAntePredictionRegressionlmMinimumcon95fit" = "Minimum Electricity Consumption Prediction, Linear Regression (kWh)", "ExAntePredictionAutoARIMAMinimumpointforecast" = "Minimum Electricity Consumption Prediction, Automatic ARIMA (kWh), the best one amongst these ten models in the test set", "ExAntePredictionRegressionlmMaximumcon95fit" = "Maximum Electricity Consumption Prediction, Linear Regression (kWh)", "ExAntePredictionAutoARIMAMaximumpointforecast" = "Maximum Electricity Consumption Prediction, Automatic ARIMA (kWh), the best one amongst these ten models in the test set")) +
+  scale_x_continuous(name="Years")+
+  scale_y_continuous(name="Electricity Consumption (kWh)\n in billions (1000000000s) or in terawatt-hours (TWh)", breaks=scales:: breaks_extended(15), labels=label_number(scale = 1/1000000000))+
+   labs(title="Electricity Consumption Prediction", caption = "Global Power Prediction Systems Robot and Platform, World 2019-2519 Prediction, researcher’s own work")+
+  coord_cartesian(clip = "off")+
+  theme_bw(base_size = 12)+
+  theme(legend.position = "bottom",  legend.justification ="top", legend.direction = "vertical", legend.box="horizontal", legend.box.just="top")
+plot(ExAntePredictionPlotIntervals)
+ggsave("WRWorldExAntePredictionPlotIntervals.jpeg", plot= ExAntePredictionPlotIntervals, width = 11, height = 7)
+
+# Electricity Consumption (kWh) exante predictions lineplot and shadows with confidence and prediction intervals
+ExAntePredictionPlotJoin <- ggplot(ExAnteWorldPredictionJoin, aes(Year))
+ExAntePredictionPlotRibbon <- ExAntePredictionPlotJoin +
+  geom_ribbon(aes(ymin = ExAntePredictionRegressionlmMinimumpre95lower, ymax = ExAntePredictionRegressionlmMinimumpre95upper), fill = "#fddcf8", show.legend = FALSE) +
+  geom_ribbon(aes(ymin = ExAntePredictionRegressionlmMinimumcon95lower, ymax = ExAntePredictionRegressionlmMinimumcon95upper), fill = "#fbc4f4", show.legend = FALSE) +
+  geom_ribbon(aes(ymin = ExAntePredictionRegressionlmMinimumpre80lower, ymax = ExAntePredictionRegressionlmMinimumpre80upper), fill = "#faacf0", show.legend = FALSE) +
+    geom_ribbon(aes(ymin = ExAntePredictionRegressionlmMinimumcon80lower, ymax = ExAntePredictionRegressionlmMinimumcon80upper), fill = "#f894ec", show.legend = FALSE) +
+  geom_line(aes(y = ExAntePredictionRegressionlmMinimumcon95fit), color = "#f564e3", size = 0.8, show.legend = TRUE) +
+geom_ribbon(aes(ymin = ExAntePredictionAutoARIMAMinimum95conlower, ymax = ExAntePredictionAutoARIMAMinimum95conupper), fill = "#00f1f8", show.legend = FALSE) +
+  geom_ribbon(aes(ymin = ExAntePredictionAutoARIMAMinimum80conlower, ymax = ExAntePredictionAutoARIMAMinimum80conupper), fill = "#00d8de", show.legend = FALSE) +
+  geom_line(aes(y = ExAntePredictionAutoARIMAMinimumpointforecast), color = "#00bfc4", size = 0.8, show.legend = TRUE) +
+  geom_ribbon(aes(ymin = ExAntePredictionRegressionlmMaximumpre95lower, ymax = ExAntePredictionRegressionlmMaximumpre95upper), fill = "#c9dcff", show.legend = FALSE) +
+  geom_ribbon(aes(ymin = ExAntePredictionRegressionlmMaximumcon95lower, ymax = ExAntePredictionRegressionlmMaximumcon95upper), fill = "#afccff", show.legend = FALSE) +
+  geom_ribbon(aes(ymin = ExAntePredictionRegressionlmMaximumpre80lower, ymax = ExAntePredictionRegressionlmMaximumpre80upper), fill = "#95bcff", show.legend = FALSE) +
+    geom_ribbon(aes(ymin = ExAntePredictionRegressionlmMaximumcon80lower, ymax = ExAntePredictionRegressionlmMaximumcon80upper), fill = "#7bacff") +
+  geom_line(aes(y = ExAntePredictionRegressionlmMaximumcon95fit), color = "#619cff", size = 0.8, show.legend = TRUE) +
+geom_ribbon(aes(ymin = ExAntePredictionAutoARIMAMaximum95conlower, ymax = ExAntePredictionAutoARIMAMaximum95conupper), fill = "#00ee48", show.legend = FALSE) +
+  geom_ribbon(aes(ymin = ExAntePredictionAutoARIMAMaximum80conlower, ymax = ExAntePredictionAutoARIMAMaximum80conupper), fill = "#00d440", show.legend = FALSE) +
+  geom_line(aes(y = ExAntePredictionAutoARIMAMaximumpointforecast) , color = "#00BA38", size = 0.8, show.legend = TRUE) +
+  scale_color_manual(name = "Electricity Consumption Predictions Of Models", values = ColorsExAnteLMARIMAIntervals, limits = c("ExAntePredictionRegressionlmMinimumcon95fit", "ExAntePredictionAutoARIMAMinimumpointforecast", "ExAntePredictionRegressionlmMaximumcon95fit", "ExAntePredictionAutoARIMAMaximumpointforecast"), labels = c("ExAntePredictionRegressionlmMinimumcon95fit" = "Minimum Electricity Consumption Prediction, Linear Regression (kWh)", "ExAntePredictionAutoARIMAMinimumpointforecast" = "Minimum Electricity Consumption Prediction, Automatic ARIMA (kWh), the best one amongst these ten models in the test set", "ExAntePredictionRegressionlmMaximumcon95fit" = "Maximum Electricity Consumption Prediction, Linear Regression (kWh)", "ExAntePredictionAutoARIMAMaximumpointforecast" = "Maximum Electricity Consumption Prediction, Automatic ARIMA (kWh), the best one amongst these ten models in the test set")) +
+  scale_x_continuous(name="Years")+
+  scale_y_continuous(name="Electricity Consumption (kWh)\n in billions (1000000000s) or in terawatt-hours (TWh)", breaks=scales:: breaks_extended(15), labels=label_number(scale = 1/1000000000))+
+   labs(title="Electricity Consumption Prediction", caption = "Global Power Prediction Systems Robot and Platform, World 2019-2519 Prediction, researcher’s own work")+
+  coord_cartesian(clip = "off")+
+  theme_bw(base_size = 12)+
+  theme(legend.position = "bottom",  legend.justification ="top", legend.direction = "vertical", legend.box="horizontal", legend.box.just="top")
+plot(ExAntePredictionPlotRibbon)
+ExAntePredictionPlotRibbonFinal <- ExAntePredictionPlotRibbon + 
+  guides(fill = guide_legend(override.aes = list(colour = c("#f564e3","#00bfc4", "#619cff", "#00BA38"))),
+         color = guide_legend(override.aes = list(colour = c("#f564e3","#00bfc4", "#619cff", "#00BA38"))))
+plot(ExAntePredictionPlotRibbonFinal)
+ggsave("WRWorldExAntePredictionPlotRibbonFinalPlot.jpeg", plot= ExAntePredictionPlotRibbonFinal, width = 11, height = 7)
+# Stop system time for runtime analysis *checkpoint*
+timestop <- Sys.time()
+# Runtime analysis *checkpoint*
+executiontime <- timestop-timestart
+# Print total runtime *checkpoint*
+print(executiontime)
+# References, additional info, etc.
+# https://ggplot2.tidyverse.org/reference/scale_manual.html
+# https://stackoverflow.com/questions/59651477/how-to-extract-from-a-ggplot-figure-which-hex-color-codes-were-used-in-the-virid
+# https://stat.ethz.ch/pipermail/r-help/2011-January/265059.html
+# https://www.colorhexa.com/00ba38
+# https://www.r-bloggers.com/2019/05/a-detailed-guide-to-ggplot-colors/
+# https://ggplot2.tidyverse.org/reference/geom_ribbon.html
+# https://typethepipe.com/vizs-and-tips/ggplot-geom_ribbon-shadow-confidence-interval/
+# # https://statisticsglobe.com/r-draw-multiple-lines-to-same-ggplot2-plot
+# https://www.r-graph-gallery.com/time-series.html
+# https://ggplot2.tidyverse.org/articles/articles/faq-customising.html
+# https://ggplot2.tidyverse.org/articles/articles/faq-axes.html
+# https://scales.r-lib.org/reference/label_number.html
+# https://www.py4u.net/discuss/881371
+# https://community.rstudio.com/t/how-to-eliminate-separate-legend-for-geom-ribbon/40896/4
+# http://ostack.cn/?qa=667306/
+# https://ggplot2.tidyverse.org/reference/guide_legend.html
+# https://community.rstudio.com/t/fill-area-between-lines-using-ggplot-in-r/35355/3
+
+# Acknowledgments and notes
+# Development and demonstration activities of Global Power Prediction Systems go well enough, when considering personal efforts alone. Despite many personal attempts, a voluntary research team can not be constituted in this research, development, and demonstration period. Hence, this robot and platform is still a personal effort. It is still a “one man show”.
+# The developer (Burak Omer Saracoglu) would sincerely like to express his deepest thankfulness first and foremost to The Victorious, The Exalted in Might and Power/Exalted/Powerful/Almighty/Mighty, the powerful and incomparable The Mighty, The Mighty One, The Almighty, the Self Sufficient, The Mighty, The Eminent. 
+# The developer (Burak Omer Saracoglu) also thanks to all developers of open source software and tools (especially the developers of R, RStudio, and R packages) and all contributors of informative webpages. 
